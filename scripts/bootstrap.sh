@@ -88,7 +88,7 @@ fi
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 ARCHIVE="$TMP/source.tar.gz"
-URL="https://api.github.com/repos/${REPO}/tarball/${REF}"
+URL="https://github.com/${REPO}/archive/${REF}.tar.gz"
 
 echo "Shadow Dream 云端安装"
 echo "仓库：$REPO"

@@ -33,8 +33,8 @@ $tmp = Join-Path ([IO.Path]::GetTempPath()) ("shadowdream-" + [guid]::NewGuid().
 New-Item -ItemType Directory -Path $tmp | Out-Null
 try {
   $archive = Join-Path $tmp 'source.zip'
-  $url = "https://api.github.com/repos/$Repo/zipball/$Ref"
-  $headers = @{ Accept = 'application/vnd.github+json' }
+  $url = "https://github.com/$Repo/archive/$Ref.zip"
+  $headers = @{}
   if ($Token) { $headers['Authorization'] = "Bearer $Token" }
   Write-Host "Downloading..."
   try {
