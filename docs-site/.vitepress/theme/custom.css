@@ -1,0 +1,29 @@
+:root {
+  --vp-c-brand-1: #38bdf8;
+  --vp-c-brand-2: #6366f1;
+  --vp-c-brand-3: #818cf8;
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(120deg, #38bdf8 20%, #818cf8);
+  --vp-home-hero-image-background-image: radial-gradient(circle at 50% 50%, rgba(56, 189, 248, .25), transparent 65%);
+}
+
+.VPHome {
+  background:
+    radial-gradient(900px 500px at 75% -10%, rgba(56, 189, 248, .12), transparent 60%),
+    radial-gradient(600px 400px at 10% 10%, rgba(99, 102, 241, .08), transparent 60%);
+}
+
+.VPHome .VPButton.brand {
+  background: linear-gradient(135deg, #38bdf8, #6366f1);
+  border-color: transparent;
+  color: #06121f;
+}
+
+.vp-doc table {
+  display: table;
+  width: 100%;
+}
+
+.vp-doc code {
+  white-space: pre-wrap;
+}

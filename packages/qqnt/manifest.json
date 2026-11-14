@@ -1,0 +1,24 @@
+{
+  "manifest_version": 4,
+  "type": "extension",
+  "name": "Shadow Dream",
+  "slug": "shadowdream",
+  "description": "把 QQNT 翻译成 OneBot 11，内置 HTTP / WebSocket / 控制台。",
+  "version": "0.1.0",
+  "icon": null,
+  "thumb": null,
+  "authors": [
+    {
+      "name": "Shadow Dream",
+      "link": "https://github.com/"
+    }
+  ],
+  "platform": [
+    "win32",
+    "linux",
+    "darwin"
+  ],
+  "injects": {
+    "main": "./main.js"
+  }
+}

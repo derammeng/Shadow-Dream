@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Shadow Dream · QQ 登录</title>
+<style>
+  :root { color-scheme: dark; --bg:#070b14; --panel:#0e1626; --line:#1e2a42; --text:#e5edf8; --muted:#8ea0bb; --accent:#38bdf8; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; display:grid; place-items:center; background:radial-gradient(900px 500px at 70% 0%, #11213a 0, var(--bg) 60%); color:var(--text); font-family:system-ui,"Segoe UI","Microsoft YaHei",sans-serif; }
+  .box { width:min(420px, calc(100vw - 32px)); background:rgba(14,22,38,.92); border:1px solid var(--line); border-radius:18px; padding:26px; box-shadow:0 30px 80px rgba(0,0,0,.45); }
+  .brand { display:flex; align-items:center; gap:10px; margin-bottom:18px; }
+  .logo { width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#38bdf8,#6366f1); display:grid; place-items:center; color:#06121f; font-weight:900; }
+  .brand b { font-size:14px; letter-spacing:.16em; }
+  .brand span { color:var(--muted); font-size:11px; display:block; letter-spacing:.06em; }
+  h1 { font-size:18px; margin:0 0 6px; }
+  p { color:var(--muted); font-size:12px; line-height:1.7; margin:0 0 16px; }
+  .tabs { display:flex; gap:6px; background:#0a1220; border:1px solid var(--line); border-radius:10px; padding:4px; margin-bottom:16px; }
+  .tab { flex:1; border:0; border-radius:7px; padding:8px; background:transparent; color:var(--muted); font-size:12px; cursor:pointer; }
+  .tab.active { background:#1b2942; color:var(--text); }
+  .qr { min-height:240px; border:1px solid var(--line); border-radius:14px; background:#fff; display:grid; place-items:center; padding:12px; }
+  .qr img { width:220px; height:220px; image-rendering:pixelated; display:none; }
+  .qr .wait { color:#334155; font-size:13px; text-align:center; line-height:1.7; }
+  .qr-refresh { margin-top:10px; width:100%; border:1px solid var(--line); border-radius:9px; padding:9px; background:#0a1220; color:var(--muted); font-size:12px; cursor:pointer; }
+  .qr-refresh:hover { border-color:var(--accent); color:var(--text); }
+  .qr-refresh:disabled { opacity:.5; cursor:wait; }
+  .hidden { display:none !important; }
+  .quick-panel { margin-bottom:16px; }
+  .quick-title { display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--muted); margin-bottom:8px; }
+  .quick-list { display:flex; flex-direction:column; gap:8px; }
+  .quick-card { display:flex; align-items:center; gap:10px; width:100%; padding:9px 10px; border:1px solid var(--line); border-radius:10px; background:#0a1220; color:var(--text); cursor:pointer; text-align:left; }
+  .quick-card:hover { border-color:var(--accent); }
+  .quick-card:disabled { opacity:.55; cursor:wait; }
+  .quick-avatar { width:32px; height:32px; border-radius:50%; object-fit:cover; background:#1b2942; display:grid; place-items:center; font-size:12px; color:var(--accent); flex:none; overflow:hidden; }
+  .quick-meta { min-width:0; }
+  .quick-name { font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .quick-sub { font-size:10px; color:var(--muted); margin-top:2px; }
+  .quick-go { margin-left:auto; color:var(--accent); font-size:11px; }
+  .pw-form { display:flex; flex-direction:column; gap:12px; }
+  .pw-form label { display:flex; flex-direction:column; gap:6px; font-size:12px; color:var(--muted); }
+  .pw-form input { width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:9px; background:#0a1220; color:var(--text); outline:none; }
+  .pw-form input:focus { border-color:var(--accent); }
+  .pw-form button { border:0; border-radius:9px; padding:11px; background:linear-gradient(135deg,#38bdf8,#6366f1); color:#06121f; font-weight:700; cursor:pointer; }
+  .pw-msg { min-height:18px; font-size:12px; color:var(--muted); line-height:1.6; }
+  .pw-msg a { color:var(--accent); }
+  .status { display:flex; align-items:center; gap:8px; margin-top:14px; font-size:12px; color:var(--muted); }
+  .dot { width:8px; height:8px; border-radius:50%; background:#f59e0b; box-shadow:0 0 10px #f59e0b; }
+  .dot.ok { background:#22c55e; box-shadow:0 0 10px #22c55e; }
+  .dot.err { background:#ef4444; box-shadow:0 0 10px #ef4444; }
+  .url { margin-top:10px; font-size:10px; color:#60718a; word-break:break-all; }
+  .foot { margin-top:18px; font-size:10px; color:#4b5b73; text-align:center; }
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="brand"><div class="logo">梦</div><div><b>SHADOW DREAM</b><span>影梦 · QQ 登录</span></div></div>
+  <div class="quick-panel hidden" id="quick-panel">
+    <div class="quick-title"><span>一键登录</span><span>已保存的 QQ</span></div>
+    <div class="quick-list" id="quick-list"></div>
+  </div>
+  <div class="tabs">
+    <button type="button" class="tab active" data-mode="qrcode">扫码登录</button>
+    <button type="button" class="tab" data-mode="password">密码登录</button>
+  </div>
+  <h1 id="login-title">扫码登录 QQ</h1>
+  <p id="login-hint">用手机 QQ 扫描二维码。登录成功后本页会自动切换到 Shadow Dream 控制台。</p>
+  <div id="qr-panel">
+    <div class="qr"><img id="qr" alt="QQ 登录二维码" /><div class="wait" id="wait">正在向 QQ 请求二维码…</div></div>
+    <button type="button" class="qr-refresh" id="qr-refresh">刷新二维码</button>
+    <div class="url" id="url"></div>
+  </div>
+  <form id="pw-panel" class="pw-form hidden">
+    <label>QQ 号<input id="pw-uin" inputmode="numeric" autocomplete="username" placeholder="10001" /></label>
+    <label>密码<input id="pw-password" type="password" autocomplete="current-password" placeholder="QQ 密码" /></label>
+    <button type="submit" id="pw-submit">登录</button>
+    <div class="pw-msg" id="pw-msg"></div>
+  </form>
+  <div class="status"><span class="dot" id="dot"></span><span id="status">等待 QQ 登录服务</span></div>
+  <div class="foot">密码只在本机内存中计算 MD5 后交给 QQ 登录服务，不保存、不上传。</div>
+</div>
+<script>
+(async function () {
+  var img = document.getElementById('qr');
+  var wait = document.getElementById('wait');
+  var dot = document.getElementById('dot');
+  var status = document.getElementById('status');
+  var url = document.getElementById('url');
+  var reloading = false;
+  var mode = 'qrcode';
+  var qrPanel = document.getElementById('qr-panel');
+  var pwPanel = document.getElementById('pw-panel');
+  var pwMsg = document.getElementById('pw-msg');
+  var loginTitle = document.getElementById('login-title');
+  var loginHint = document.getElementById('login-hint');
+  var quickPanel = document.getElementById('quick-panel');
+  var quickList = document.getElementById('quick-list');
+  var lastAccounts = '';
+  function esc(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+    });
+  }
+  function renderAccounts(accounts) {
+    var json = JSON.stringify(accounts || []);
+    if (json === lastAccounts) return;
+    lastAccounts = json;
+    if (!accounts || accounts.length === 0) {
+      quickPanel.classList.add('hidden');
+      quickList.innerHTML = '';
+      return;
+    }
+    quickPanel.classList.remove('hidden');
+    quickList.innerHTML = accounts.map(function (account) {
+      var name = account.nickName || ('QQ ' + account.uin);
+      var avatar = account.faceUrl
+        ? '<img class="quick-avatar" src="' + esc(account.faceUrl) + '" alt="" />'
+        : '<div class="quick-avatar">' + esc(name.slice(0, 1)) + '</div>';
+      return '<button type="button" class="quick-card" data-uin="' + esc(account.uin) + '">'
+        + avatar
+        + '<div class="quick-meta"><div class="quick-name">' + esc(name) + '</div>'
+        + '<div class="quick-sub">QQ ' + esc(account.uin) + (account.isQuickLogin ? ' · 快速登录' : '') + '</div></div>'
+        + '<span class="quick-go">一键登录</span>'
+        + '</button>';
+    }).join('');
+    quickList.querySelectorAll('.quick-card').forEach(function (button) {
+      button.addEventListener('click', function () { quickLogin(button.dataset.uin, button); });
+    });
+  }
+  async function quickLogin(uin, button) {
+    if (!uin) return;
+    button.disabled = true;
+    setStatus('正在登录 QQ ' + uin + '…', '');
+    try {
+      var res = await fetch('/webui/api/login/quick', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uin: uin })
+      });
+      var data = await res.json();
+      if (data.ok) {
+        setStatus('登录成功，正在启动 Shadow Dream…', 'ok');
+        setTimeout(function () { location.reload(); }, 1800);
+      } else {
+        button.disabled = false;
+        setStatus(data.message || '一键登录失败', 'err');
+      }
+    } catch (e) {
+      button.disabled = false;
+      setStatus('一键登录请求失败：' + (e.message || e), 'err');
+    }
+  }
+  var qrRefresh = document.getElementById('qr-refresh');
+  qrRefresh.addEventListener('click', async function () {
+    qrRefresh.disabled = true;
+    try {
+      var res = await fetch('/webui/api/login/qr/refresh', { method: 'POST' });
+      var data = await res.json();
+      if (!data.ok) {
+        setStatus(data.message || '刷新二维码失败', 'err');
+      } else {
+        setStatus('正在刷新二维码…', '');
+      }
+    } catch (e) {
+      setStatus('刷新请求失败：' + (e.message || e), 'err');
+    } finally {
+      setTimeout(function () { qrRefresh.disabled = false; }, 1200);
+    }
+  });
+  document.querySelectorAll('.tab').forEach(function (button) {
+    button.addEventListener('click', function () {
+      mode = button.dataset.mode;
+      document.querySelectorAll('.tab').forEach(function (item) {
+        item.classList.toggle('active', item === button);
+      });
+      qrPanel.classList.toggle('hidden', mode !== 'qrcode');
+      pwPanel.classList.toggle('hidden', mode !== 'password');
+      loginTitle.textContent = mode === 'qrcode' ? '扫码登录 QQ' : '密码登录 QQ';
+      loginHint.textContent = mode === 'qrcode'
+        ? '用手机 QQ 扫描二维码。登录成功后本页会自动切换到 Shadow Dream 控制台。'
+        : '使用 QQ 号 + 密码登录。密码在服务端计算 MD5 后交给 QQ 登录服务，不保存。';
+    });
+  });
+  document.getElementById('pw-panel').addEventListener('submit', async function (event) {
+    event.preventDefault();
+    var uin = document.getElementById('pw-uin').value.trim();
+    var password = document.getElementById('pw-password').value;
+    if (!/^[0-9]{5,12}$/.test(uin)) { pwMsg.textContent = 'QQ 号格式不对'; return; }
+    if (!password) { pwMsg.textContent = '请输入密码'; return; }
+    document.getElementById('pw-submit').disabled = true;
+    pwMsg.textContent = '正在登录…';
+    try {
+      var res = await fetch('/webui/api/login/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uin: uin, password: password })
+      });
+      var data = await res.json();
+      if (data.ok) {
+        pwMsg.textContent = '登录成功，正在启动 Shadow Dream…';
+        setStatus('登录成功，正在启动 Shadow Dream…', 'ok');
+        setTimeout(function () { location.reload(); }, 2000);
+      } else {
+        pwMsg.textContent = data.message || '登录失败';
+        if (data.jumpUrl) {
+          pwMsg.innerHTML = (data.message || '需要验证') + '：<a href="' + data.jumpUrl + '" target="_blank" rel="noreferrer">打开验证页面</a>';
+        }
+        setStatus(data.message || '密码登录失败', 'err');
+      }
+    } catch (e) {
+      pwMsg.textContent = '请求失败：' + (e.message || e);
+    } finally {
+      document.getElementById('pw-submit').disabled = false;
+    }
+  });
+  function setStatus(text, kind) {
+    status.textContent = text;
+    dot.className = 'dot' + (kind === 'ok' ? ' ok' : (kind === 'err' ? ' err' : ''));
+  }
+  async function tick() {
+    try {
+      var res = await fetch('/webui/api/login/status', { cache: 'no-store' });
+      var data = await res.json();
+      if (data.image) {
+        img.src = data.image;
+        img.style.display = 'block';
+        wait.style.display = 'none';
+      }
+      var phase = data.phase || 'starting';
+      var map = {
+        starting: '等待 QQ 登录服务',
+        refreshing: '正在刷新二维码…',
+        connected: 'QQ 登录服务已连接，请求二维码…',
+        waiting: '请用手机 QQ 扫码',
+        scanned: '已扫码，请在手机上确认',
+        success: '登录成功，正在启动 Shadow Dream…',
+        expired: '二维码已过期，正在刷新…',
+        error: '登录失败：' + (data.error || '未知错误')
+      };
+      status.textContent = map[phase] || phase;
+      dot.className = 'dot' + (phase === 'success' ? ' ok' : (phase === 'error' ? ' err' : ''));
+      url.textContent = data.url || '';
+      renderAccounts(data.accounts);
+      if (phase === 'success' && !reloading) {
+        reloading = true;
+        status.textContent = '登录成功，等待控制台启动…';
+        setTimeout(function () { location.reload(); }, 2500);
+      }
+    } catch (e) {
+      status.textContent = '等待控制台启动…';
+      dot.className = 'dot ok';
+      if (!reloading) {
+        reloading = true;
+        setTimeout(function () { location.reload(); }, 2000);
+      }
+    }
+    setTimeout(tick, 1200);
+  }
+  tick();
+})();
+</script>
+</body>
+</html>

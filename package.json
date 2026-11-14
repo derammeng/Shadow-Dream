@@ -1,0 +1,36 @@
+{
+  "name": "shadowdream",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Shadow Dream · 把 QQ 变成 OneBot 11 的轻量运行时",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "build:core": "npm run build -w @shadowdream/core",
+    "build:core:cjs": "npm run build:cjs -w @shadowdream/core",
+    "build:plugin": "npm run build:core:cjs && npm run build -w @shadowdream/qqnt",
+    "demo": "npm run build:core && npm run build -w @shadowdream/mock && node packages/mock/dist/cli.js",
+    "start": "node packages/mock/dist/cli.js",
+    "pretest": "npm run build",
+    "test": "npm run test --workspaces --if-present",
+    "test:core": "npm run test -w @shadowdream/core",
+    "docs:dev": "vitepress dev docs-site",
+    "docs:build": "vitepress build docs-site",
+    "docs:preview": "vitepress preview docs-site",
+    "pretypecheck": "npm run build:core",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "clean": "node scripts/clean.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "typescript": "^5.7.3",
+    "vitepress": "^1.6.4"
+  }
+}

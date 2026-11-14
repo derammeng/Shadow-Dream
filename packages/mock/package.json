@@ -1,0 +1,21 @@
+{
+  "name": "@shadowdream/mock",
+  "version": "0.1.0",
+  "description": "Shadow Dream 内置的模拟 QQ 后端与演示 CLI",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "fd-mock": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/cli.js",
+    "demo": "npm run build -w @shadowdream/core && npm run build && node dist/cli.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsc -p tsconfig.test.json && node dist-test/tests/run.js"
+  },
+  "dependencies": {
+    "@shadowdream/core": "^0.1.0"
+  }
+}

@@ -1,0 +1,26 @@
+[Unit]
+Description=Shadow Dream · headless Linux QQNT
+Documentation=https://github.com/
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=qq
+Group=qq
+WorkingDirectory=/opt/QQ
+Environment=QQ_DIR=/opt/QQ/squashfs-root
+Environment=LITELOADERQQNT_PROFILE=/opt/QQ/profile
+Environment=DISPLAY_NUM=:99
+ExecStart=/opt/shadowdream/scripts/start-qq-headless.sh
+Restart=on-failure
+RestartSec=5
+KillMode=mixed
+TimeoutStopSec=20
+
+# QQ 需要写自己的数据目录；不要给它整个文件系统写权限。
+NoNewPrivileges=true
+PrivateTmp=false
+
+[Install]
+WantedBy=multi-user.target
