@@ -61,4 +61,4 @@ export LD_LIBRARY_PATH="$APPDIR:$APPDIR/usr/lib:$LD_LIBRARY_PATH"
 - 不要把未设 token 的 3000 端口直接暴露公网；
 - 如果 QQ 登录页只监听不响应，先确认 QQ 进程没有段错误，再清理旧 Xvfb / profile 后重试。
 
-更完整的 systemd 示例见仓库 `docs/headless.md`。
+更完整的 systemd 示例见项目内 `docs/headless.md`。

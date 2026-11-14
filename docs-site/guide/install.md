@@ -16,26 +16,6 @@ irm https://raw.githubusercontent.com/derammeng/Shadow-Dream/main/scripts/bootst
 
 脚本会下载源码到 `~/ShadowDream`（Windows 是 `%USERPROFILE%\ShadowDream`），安装依赖、构建并生成配置。
 
-### 私有仓库
-
-私有仓库不能匿名访问 `raw.githubusercontent.com`。需要 GitHub PAT（至少 repo 读权限），或者把仓库设为公开。
-
-Linux：
-
-```bash
-export SHADOWDREAM_TOKEN=ghp_xxx
-curl -fsSL -H "Authorization: Bearer $SHADOWDREAM_TOKEN" \
-  https://raw.githubusercontent.com/derammeng/Shadow-Dream/main/scripts/bootstrap.sh | bash
-```
-
-Windows：
-
-```powershell
-$env:SHADOWDREAM_TOKEN = 'ghp_xxx'
-$headers = @{ Authorization = "Bearer $env:SHADOWDREAM_TOKEN" }
-irm -Headers $headers https://raw.githubusercontent.com/derammeng/Shadow-Dream/main/scripts/bootstrap.ps1 | iex
-```
-
 ### 一键安装参数
 
 ```bash
@@ -52,7 +32,6 @@ bash <(curl -fsSL .../scripts/bootstrap.sh)
 | `SHADOWDREAM_REF` | 分支 / tag，默认 `main` |
 | `SHADOWDREAM_PLUGINS` | LiteLoaderQQNT 的 plugins 目录 |
 | `SHADOWDREAM_WEBUI_TOKEN` | 指定 WebUI token |
-| `SHADOWDREAM_TOKEN` | 私有仓库的 GitHub PAT |
 
 ## 环境要求
 
