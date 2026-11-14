@@ -397,7 +397,7 @@ shadowdream/
 
 ## 致谢
 
-- [NapCatQQ](https://github.com/NapNeko/NapCatQQ) 与 SnowLuma（参考文件夹中的归档源码）：参考了 NTQQ wrapper 的公开接口形状、OneBot 行为边界与 native 捕获思路；本项目未复制其代码。
+- [NapCatQQ](https://github.com/NapNeko/NapCatQQ) 与 SnowLuma：参考了 NTQQ wrapper 的公开接口形状、OneBot 行为边界与 native 捕获思路；本项目未复制其代码。
 - [LiteLoaderQQNT](https://github.com/LiteLoaderQQNT/LiteLoaderQQNT)：插件加载器与 API。
 - [OneBot 11](https://github.com/botuniverse/onebot-11)：协议标准。
 - [Lagrange](https://github.com/LagrangeDev/Lagrange.Core)：NTQQ 协议与数据结构的重要公开参考。
