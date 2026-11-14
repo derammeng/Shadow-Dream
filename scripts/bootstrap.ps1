@@ -45,7 +45,7 @@ try {
 
   Expand-Archive -LiteralPath $archive -DestinationPath $tmp -Force
   $src = Get-ChildItem -LiteralPath $tmp -Directory |
-    Where-Object { $_.Name -like 'Shadow-Dream-*' } |
+    Where-Object { $_.Name -like '*Shadow-Dream*' } |
     Select-Object -First 1
   if (-not $src -or -not (Test-Path (Join-Path $src.FullName 'package.json'))) {
     throw 'Archive does not look like Shadow Dream (package.json missing).'

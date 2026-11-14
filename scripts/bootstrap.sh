@@ -54,6 +54,23 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# 非交互 shell 通常不会加载 nvm，先尝试常见安装位置。
+if ! command -v node >/dev/null 2>&1; then
+  export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+  if [ -s "$NVM_DIR/nvm.sh" ]; then
+    # shellcheck disable=SC1090
+    . "$NVM_DIR/nvm.sh" >/dev/null 2>&1 || true
+  fi
+fi
+if ! command -v node >/dev/null 2>&1; then
+  for candidate in "$HOME"/.nvm/versions/node/*/bin; do
+    if [ -x "$candidate/node" ]; then
+      PATH="$candidate:$PATH"
+      break
+    fi
+  done
+  export PATH
+fi
 if ! command -v node >/dev/null 2>&1; then
   echo "未找到 Node.js。请先安装 Node.js 22+：https://nodejs.org/" >&2
   exit 1
@@ -92,7 +109,7 @@ if ! curl "${CURL_ARGS[@]}"; then
 fi
 
 tar -xzf "$ARCHIVE" -C "$TMP"
-SRC="$(find "$TMP" -mindepth 1 -maxdepth 1 -type d -name 'Shadow-Dream-*' | head -n 1)"
+SRC="$(find "$TMP" -mindepth 1 -maxdepth 1 -type d -name '*Shadow-Dream*' | head -n 1)"
 if [[ -z "$SRC" || ! -f "$SRC/package.json" ]]; then
   echo "压缩包结构异常，找不到 package.json。" >&2
   exit 1
