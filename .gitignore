@@ -19,3 +19,7 @@ logs/
 rollback/
 docs-site/.vitepress/cache/
 docs-site/.vitepress/dist/
+
+# Visual Studio「打开文件夹」的本地缓存
+.vs/
+obj/

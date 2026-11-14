@@ -1,0 +1,56 @@
+{
+  "version": "0.2.1",
+  "outDir": "\"${workspaceRoot}\"",
+  "tasks": [
+    {
+      "taskName": "build",
+      "appliesTo": "*/",
+      "type": "launch",
+      "contextType": "build",
+      "command": "${env.COMSPEC}",
+      "args": ["/c", "npm run build"],
+      "cwd": "${workspaceRoot}"
+    },
+    {
+      "taskName": "test",
+      "appliesTo": "*/",
+      "type": "launch",
+      "contextType": "test",
+      "command": "${env.COMSPEC}",
+      "args": ["/c", "npm test"],
+      "cwd": "${workspaceRoot}"
+    },
+    {
+      "taskName": "typecheck",
+      "appliesTo": "*/",
+      "type": "default",
+      "command": "${env.COMSPEC}",
+      "args": ["/c", "npm run typecheck"],
+      "cwd": "${workspaceRoot}"
+    },
+    {
+      "taskName": "demo (mock 后端 3000/3001)",
+      "appliesTo": "*/",
+      "type": "default",
+      "command": "${env.COMSPEC}",
+      "args": ["/c", "npm run demo"],
+      "cwd": "${workspaceRoot}"
+    },
+    {
+      "taskName": "docs:dev (文档站预览)",
+      "appliesTo": "*/",
+      "type": "default",
+      "command": "${env.COMSPEC}",
+      "args": ["/c", "npm run docs:dev"],
+      "cwd": "${workspaceRoot}"
+    },
+    {
+      "taskName": "npm install",
+      "appliesTo": "*/",
+      "type": "default",
+      "command": "${env.COMSPEC}",
+      "args": ["/c", "npm install"],
+      "cwd": "${workspaceRoot}"
+    }
+  ]
+}
