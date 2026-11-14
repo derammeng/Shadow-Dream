@@ -2,7 +2,7 @@
 
 ## 一键安装
 
-公开仓库可以直接拉脚本：
+直接拉取脚本：
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/derammeng/Shadow-Dream/main/scripts/bootstrap.sh)
