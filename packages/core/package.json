@@ -1,6 +1,6 @@
 {
   "name": "@shadowdream/core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Shadow Dream OneBot 11 core: transports, actions, message model and web dashboard",
   "type": "module",
   "main": "./dist/index.js",

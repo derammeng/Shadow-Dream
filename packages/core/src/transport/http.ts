@@ -6,6 +6,7 @@ import type { WebUiHost } from '../webui/types.js';
 import { checkToken, extractToken, unauthorizedBody } from './auth.js';
 import { applyCors, methodNotAllowed, queryToParams, readJson, sendJson } from './http-util.js';
 import type { ActionExecutor } from './types.js';
+import { isWildcardHost, httpUrl } from '../util/network.js';
 
 export interface HttpTransportOptions {
   config: HttpConfig;
@@ -39,7 +40,7 @@ export class HttpTransport {
   }
 
   get url(): string {
-    return `http://${displayHost(this.options.config.host)}:${this.actualPort}`;
+    return httpUrl(this.options.config.host, this.actualPort);
   }
 
   async start(): Promise<void> {
@@ -57,7 +58,9 @@ export class HttpTransport {
         this.server.off('error', onError);
         const address = this.server.address();
         if (address && typeof address === 'object') this.actualPort = address.port;
-        this.options.logger.info(`HTTP API 已监听 ${this.url}`);
+        const bind = `${this.options.config.host}:${this.actualPort}`;
+        const suffix = isWildcardHost(this.options.config.host) ? `（绑定 ${bind}）` : '';
+        this.options.logger.info(`HTTP API 已监听 ${this.url}${suffix}`);
         if (this.options.config.webui) this.options.logger.info(`WebUI: ${this.url}/webui/`);
         resolve();
       };
@@ -191,9 +194,4 @@ export class HttpTransport {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function displayHost(host: string): string {
-  if (host === '0.0.0.0' || host === '::') return '127.0.0.1';
-  return host;
 }

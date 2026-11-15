@@ -6,6 +6,7 @@ import type { OneBotEvent } from '../types/onebot.js';
 import type { Logger } from '../util/logger.js';
 import { checkToken, extractToken, unauthorizedBody } from './auth.js';
 import type { ActionExecutor } from './types.js';
+import { isWildcardHost, wsUrl } from '../util/network.js';
 
 type ClientRole = 'api' | 'event' | 'universal';
 
@@ -51,10 +52,8 @@ export class WsServerTransport {
   }
 
   get url(): string {
-    const host = this.options.config.host;
-    const display = host === '0.0.0.0' || host === '::' ? '127.0.0.1' : host;
     const suffix = this.options.config.path === '/' ? '' : this.options.config.path;
-    return `ws://${display}:${this.actualPort}${suffix}`;
+    return wsUrl(this.options.config.host, this.actualPort, suffix);
   }
 
   get clientCount(): number {
@@ -93,7 +92,9 @@ export class WsServerTransport {
         server.off('error', onError);
         const address = server.address();
         if (address && typeof address === 'object') this.actualPort = address.port;
-        this.options.logger.info(`WebSocket 已监听 ${this.url}`);
+        const bind = `${this.options.config.host}:${this.actualPort}`;
+        const suffix = isWildcardHost(this.options.config.host) ? `（绑定 ${bind}）` : '';
+        this.options.logger.info(`WebSocket 已监听 ${this.url}${suffix}`);
         resolve();
       };
       server.once('error', onError);

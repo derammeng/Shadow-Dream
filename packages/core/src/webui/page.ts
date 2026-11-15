@@ -247,10 +247,6 @@ pre.result {
 .ws-form { width: min(560px, 100%); }
 .ws-form .form-grid { margin: 12px 0; }
 .ws-form .login-actions { margin-top: 6px; }
-.login-overlay {
-  position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px;
-  background: rgba(3, 7, 18, 0.78); backdrop-filter: blur(8px);
-}
 .login-box { width: min(380px, 100%); padding: 24px; border-radius: 17px; border: 1px solid var(--line-strong); background: #0d1424; box-shadow: 0 30px 90px rgba(0,0,0,0.55); }
 .login-box h3 { margin: 0 0 4px; font-size: 18px; }
 .login-box p { margin: 0 0 18px; color: var(--muted); font-size: 12px; }
@@ -315,11 +311,12 @@ export const WEBUI_HTML = `<!doctype html>
         <button class="nav-item" data-view="account">账号</button>
         <button class="nav-item" data-view="debug">调试台</button>
         <button class="nav-item" data-view="logs">日志</button>
+        <button class="nav-item" data-view="update">更新</button>
         <button class="nav-item" data-view="about">关于</button>
       </nav>
       <div class="side-foot">
         <span id="side-dot" class="dot"></span>
-        <div><strong id="side-status">连接中</strong><small id="side-version">v0.1.0</small></div>
+        <div><strong id="side-status">连接中</strong><small id="side-version">v0.2.0</small></div>
       </div>
     </aside>
 
@@ -331,7 +328,6 @@ export const WEBUI_HTML = `<!doctype html>
         </div>
         <div class="top-actions">
           <span class="pill"><span id="top-dot" class="dot"></span><span id="top-status">连接中</span></span>
-          <button class="btn ghost sm" id="token-btn">Token</button>
           <button class="btn ghost sm" id="logout-btn">退出</button>
           <button class="btn ghost sm" id="refresh-btn">刷新</button>
         </div>
@@ -372,7 +368,7 @@ export const WEBUI_HTML = `<!doctype html>
             <h3>运行信息</h3>
             <p class="hint">账号登录由后端管理。</p>
             <div class="meta-line"><span>登录方式</span><span id="ov-login">-</span></div>
-            <div class="meta-line"><span>配置热更新</span><span id="ov-hot">-</span></div>
+            <div class="meta-line"><span>配置自动重载</span><span id="ov-hot">-</span></div>
             <div class="meta-line"><span>配置文件</span><span id="ov-config">-</span></div>
             <div class="meta-line"><span>WebUI 版本</span><span id="ov-version">-</span></div>
             <div class="section-tools">
@@ -443,7 +439,7 @@ export const WEBUI_HTML = `<!doctype html>
         </div>
 
         <div class="actions-bar">
-          <button class="btn" id="net-save">保存并热更新</button>
+          <button class="btn" id="net-save">保存并应用</button>
           <button class="btn ghost" id="net-reload">从磁盘重载</button>
           <button class="btn ghost" id="net-restart">重启连接</button>
           <span class="status" id="net-status">读取配置中…</span>
@@ -554,6 +550,34 @@ export const WEBUI_HTML = `<!doctype html>
         </div>
       </section>
 
+      <section id="view-update" class="view">
+        <div class="grid-two">
+          <div class="card">
+            <h3>软件更新</h3>
+            <p class="hint">从 GitHub Release 检查并安装更新。更新时 QQ 会退出并自动重启，配置和插件 data 会保留。</p>
+            <div class="about-grid">
+              <div class="kv"><span>当前版本</span><strong id="update-current">-</strong></div>
+              <div class="kv"><span>最新版本</span><strong id="update-latest">-</strong></div>
+              <div class="kv"><span>安装目录</span><strong id="update-root">-</strong></div>
+              <div class="kv"><span>状态</span><strong id="update-status">未检查</strong></div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+              <button class="btn" id="update-check">检查更新</button>
+              <button class="btn danger" id="update-apply" disabled>下载并安装</button>
+            </div>
+            <p class="hint" id="update-hint" style="margin-top:12px">更新会停止 QQ / Shadow Dream，完成后自动重启。</p>
+            <pre id="update-log" style="display:none;margin:12px 0 0;padding:10px;border:1px solid var(--line);border-radius:8px;background:#0a1220;color:var(--muted);font-size:11px;white-space:pre-wrap;word-break:break-all"></pre>
+          </div>
+          <div class="card">
+            <h3>更新说明</h3>
+            <p class="hint">检查源是 <code>install-latest</code> Release 里的 <code>install-bundle.json</code>；下载的是同版本的精简安装包。</p>
+            <p class="hint">如果刚推送代码，需要等 GitHub Actions 发布新清单后再检查，否则会显示“已经是最新版本”。</p>
+            <p class="hint">更新过程中 WebUI 会断开；QQ 重启并重新登录后，回到这个页面刷新即可。</p>
+            <p class="hint">Linux 安装支持一键更新；当前 Windows 原生安装请用安装脚本更新插件。</p>
+          </div>
+        </div>
+      </section>
+
       <section id="view-about" class="view">
         <div class="grid-two">
           <div class="card">
@@ -564,7 +588,7 @@ export const WEBUI_HTML = `<!doctype html>
               <div class="kv"><span>协议</span><strong>OneBot 11</strong></div>
               <div class="kv"><span>后端</span><strong id="about-backend">-</strong></div>
               <div class="kv"><span>配置文件</span><strong id="about-config">-</strong></div>
-              <div class="kv"><span>热更新</span><strong id="about-hot">-</strong></div>
+              <div class="kv"><span>自动重载</span><strong id="about-hot">-</strong></div>
               <div class="kv"><span>构建目标</span><strong>Node.js 22+</strong></div>
             </div>
           </div>
@@ -601,21 +625,8 @@ export const WEBUI_HTML = `<!doctype html>
         <label class="check"><input id="ws-enabled" type="checkbox" /> 启用这个端点</label>
       </div>
       <div class="login-actions">
-        <button type="submit" class="btn">保存并热更新</button>
+        <button type="submit" class="btn">保存并应用</button>
         <button type="button" class="btn ghost" id="ws-cancel">取消</button>
-      </div>
-    </form>
-  </div>
-
-  <div class="login-overlay hidden" id="login-overlay">
-    <form class="login-box" id="login-form">
-      <h3>进入控制台</h3>
-      <p>这个实例设置了 access token。输入 token 后才能管理网络、账号和日志。</p>
-      <input id="login-token" type="password" placeholder="access token" autocomplete="current-password" />
-      <div class="error" id="login-error"></div>
-      <div class="login-actions">
-        <button type="submit" class="btn">进入</button>
-        <button type="button" class="btn ghost" id="login-cancel">取消</button>
       </div>
     </form>
   </div>
@@ -638,7 +649,9 @@ export const WEBUI_JS = `
     paused: false,
     view: 'overview',
     logLevel: 'all',
-    logSearch: ''
+    logSearch: '',
+    update: null,
+    updateBusy: false
   };
 
   function $(id) { return document.getElementById(id); }
@@ -687,7 +700,8 @@ export const WEBUI_JS = `
         var data = {};
         try { data = text ? JSON.parse(text) : {}; } catch (e) { data = { message: text }; }
         if (res.status === 401) {
-          showLogin();
+          localStorage.removeItem(TOKEN_KEY);
+          location.replace('/webui/');
           var unauthorized = new Error('需要 access token');
           unauthorized.unauthorized = true;
           throw unauthorized;
@@ -702,36 +716,102 @@ export const WEBUI_JS = `
     });
   }
 
-  function showLogin() {
-    var wasHidden = $('login-overlay').classList.contains('hidden');
-    $('login-overlay').classList.remove('hidden');
-    $('login-token').value = state.token;
-    $('login-error').textContent = '';
-    if (wasHidden) setTimeout(function () { $('login-token').focus(); }, 20);
+  function fmtCommit(value) {
+    if (!value) return '未知';
+    var text = String(value);
+    return text.length > 10 ? text.slice(0, 7) : text;
   }
-  function hideLogin() { $('login-overlay').classList.add('hidden'); }
-  function submitLogin(event) {
-    event.preventDefault();
-    var token = $('login-token').value.trim();
-    state.token = token;
-    localStorage.setItem(TOKEN_KEY, token);
-    request('/webui/api/overview').then(function () {
-      hideLogin();
-      loadAll();
-      showToast('已进入控制台');
+
+  function loadUpdateInfo() {
+    if (state.updateBusy) return;
+    state.updateBusy = true;
+    setText('update-status', '检查中…');
+    setText('update-hint', '正在访问 GitHub Release 清单…');
+    $('update-apply').disabled = true;
+    request('/webui/api/update/check').then(function (payload) {
+      var data = payload.data || {};
+      state.update = data;
+      setText('update-current', fmtCommit(data.current));
+      setText('update-latest', fmtCommit(data.latest));
+      setText('update-root', data.root || '未找到源码目录');
+      if (!data.supported) {
+        setText('update-status', '当前环境不支持一键更新');
+        setText('update-hint', '需要 Linux 源码目录和 scripts/update-shadowdream.sh。');
+        $('update-apply').disabled = true;
+      } else if (data.error) {
+        setText('update-status', '检查失败');
+        setText('update-hint', data.error);
+        $('update-apply').disabled = true;
+      } else if (data.updateAvailable) {
+        setText('update-status', '发现新版本');
+        setText('update-hint', '可以下载并安装；安装过程中 QQ 会退出，完成后自动重启。');
+        $('update-apply').disabled = false;
+      } else {
+        setText('update-status', '已经是最新版本');
+        setText('update-hint', '当前版本和 install-latest 清单一致。');
+        $('update-apply').disabled = true;
+      }
     }).catch(function (error) {
-      if (!error.unauthorized) $('login-error').textContent = String(error.message || error);
-      else $('login-error').textContent = 'token 不正确';
+      setText('update-status', '检查失败');
+      setText('update-hint', error.message || String(error));
+      $('update-apply').disabled = true;
+    }).finally(function () {
+      state.updateBusy = false;
+    });
+  }
+
+  function waitForRestart() {
+    var attempts = 0;
+    var sawDown = false;
+    var timer = setInterval(function () {
+      attempts += 1;
+      fetch('/webui/api/session', { cache: 'no-store' }).then(function (res) {
+        if (res.ok && sawDown) {
+          clearInterval(timer);
+          location.reload();
+        }
+      }).catch(function () {
+        sawDown = true;
+      });
+      if (attempts > 120) clearInterval(timer);
+    }, 3000);
+  }
+
+  function applyUpdateUI() {
+    if (state.updateBusy || !state.update || !state.update.updateAvailable) return;
+    if (!window.confirm('更新会停止 QQ / Shadow Dream，安装完成后自动重启。继续？')) return;
+    state.updateBusy = true;
+    $('update-apply').disabled = true;
+    $('update-check').disabled = true;
+    setText('update-status', '正在启动更新…');
+    request('/webui/api/update/apply', { method: 'POST' }).then(function (payload) {
+      var data = payload.data || {};
+      setText('update-status', '更新已开始');
+      setText('update-hint', 'QQ 即将退出并自动重启；页面恢复后会刷新。');
+      var log = $('update-log');
+      if (data.logPath) {
+        log.style.display = 'block';
+        log.textContent = '更新日志：' + data.logPath;
+      }
+      showBanner('更新已开始，QQ / Shadow Dream 正在重启。请稍候…');
+      waitForRestart();
+    }).catch(function (error) {
+      state.updateBusy = false;
+      $('update-apply').disabled = false;
+      $('update-check').disabled = false;
+      setText('update-status', '启动更新失败');
+      setText('update-hint', error.message || String(error));
     });
   }
 
   var viewMeta = {
     overview: ['概览', '运行状态与连接'],
-    network: ['网络与反代', 'HTTP / 反向 WS / 热更新'],
+    network: ['网络与反代', 'HTTP / 反向 WS / 自动重载'],
     ws: ['WebSocket', '正向 WebSocket 服务器（每个地址独立管理）'],
     account: ['账号', '当前登录账号与后端登录方式'],
     debug: ['调试台', '动作调用与模拟消息'],
     logs: ['日志', '实时日志与过滤器'],
+    update: ['更新', '检查并安装 Shadow Dream 新版本'],
     about: ['关于', '版本、配置与安全提示']
   };
   function switchView(view) {
@@ -749,6 +829,7 @@ export const WEBUI_JS = `
     }
     if (view === 'network' || view === 'ws') loadConfig();
     if (view === 'logs') refreshLogs();
+    if (view === 'update') loadUpdateInfo();
     if (view === 'about' && state.overview) renderAbout(state.overview);
   }
 
@@ -855,7 +936,6 @@ export const WEBUI_JS = `
 
   function loadOverview() {
     return request('/webui/api/overview').then(function (data) {
-      hideLogin();
       renderOverview(data);
     }).catch(function (error) {
       if (!error.unauthorized) {
@@ -957,7 +1037,9 @@ export const WEBUI_JS = `
   }
 
   function wsUrl(server) {
-    var host = (server.host === '0.0.0.0' || server.host === '::') ? '127.0.0.1' : server.host;
+    var host = (server.host === '0.0.0.0' || server.host === '::')
+      ? (window.location.hostname || '127.0.0.1')
+      : server.host;
     var suffix = server.path && server.path !== '/' ? server.path : '';
     return 'ws://' + host + ':' + server.port + suffix;
   }
@@ -1181,7 +1263,7 @@ export const WEBUI_JS = `
         showToast('配置已保存，正在重启连接');
       } else {
         hideBanner();
-        showToast('配置已保存并热更新');
+        showToast('配置已保存并应用');
         setText('net-status', '已应用');
       }
       setTimeout(loadOverview, 700);
@@ -1304,6 +1386,7 @@ export const WEBUI_JS = `
     loadOverview();
     if (state.view === 'network' || state.view === 'ws') loadConfig();
     if (state.view === 'logs') refreshLogs();
+    if (state.view === 'update') loadUpdateInfo();
   }
 
   document.querySelectorAll('.nav-item').forEach(function (item) {
@@ -1320,7 +1403,6 @@ export const WEBUI_JS = `
     });
   });
 
-  $('token-btn').addEventListener('click', showLogin);
   $('gen-webui-token').addEventListener('click', function () {
     var bytes = new Uint8Array(15);
     crypto.getRandomValues(bytes);
@@ -1335,8 +1417,6 @@ export const WEBUI_JS = `
     location.replace('/webui/');
   });
   $('refresh-btn').addEventListener('click', function () { loadAll(); showToast('已刷新'); });
-  $('login-form').addEventListener('submit', submitLogin);
-  $('login-cancel').addEventListener('click', hideLogin);
   $('net-save').addEventListener('click', saveNetwork);
   $('net-reload').addEventListener('click', reloadConfig);
   $('net-restart').addEventListener('click', restartConnections);
@@ -1370,6 +1450,8 @@ export const WEBUI_JS = `
     setText('log-count', '0');
   });
   $('log-download').addEventListener('click', downloadLogs);
+  $('update-check').addEventListener('click', loadUpdateInfo);
+  $('update-apply').addEventListener('click', applyUpdateUI);
   $('acc-refresh').addEventListener('click', function () { loadOverview().then(function () { showToast('账号状态已刷新'); }); });
 
   var initialView = location.hash.replace(/^#/, '');

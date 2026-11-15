@@ -32,7 +32,7 @@ export class HttpPostTransport {
   private async post(target: HttpPostConfig, body: string): Promise<void> {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      'User-Agent': 'Shadow Dream/0.1.0',
+      'User-Agent': 'Shadow Dream/0.2.0',
       'X-Self-ID': String(this.options.selfId),
     };
     if (target.secret) {

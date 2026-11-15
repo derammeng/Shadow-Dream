@@ -18,6 +18,7 @@ export default defineConfig({
       { text: '部署', link: '/guide/install' },
       { text: '排故', link: '/guide/troubleshooting' },
       { text: 'API', link: '/api/onebot' },
+      { text: '更新日志', link: 'https://github.com/derammeng/Shadow-Dream/blob/main/CHANGELOG.md' },
     ],
     sidebar: {
       '/guide/': [

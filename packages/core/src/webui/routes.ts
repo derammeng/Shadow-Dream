@@ -188,6 +188,18 @@ export async function handleWebUi(
       return true;
     }
 
+    if (path === '/webui/api/update/check' && req.method === 'GET') {
+      const result = await host.checkUpdate();
+      sendJson(res, 200, { status: 'ok', retcode: 0, data: result });
+      return true;
+    }
+
+    if (path === '/webui/api/update/apply' && req.method === 'POST') {
+      const result = await host.applyUpdate();
+      sendJson(res, 200, { status: 'ok', retcode: 0, data: result });
+      return true;
+    }
+
     if (path === '/webui/api/config' && req.method === 'GET') {
       sendJson(res, 200, {
         config: host.getConfig(),

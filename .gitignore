@@ -6,6 +6,7 @@ packages/qqnt/release/
 *.zip
 config/shadowdream.json
 config/*.local.json
+install-bundle.json
 .npm-cache/
 .edge-tmp*/
 .tmp/

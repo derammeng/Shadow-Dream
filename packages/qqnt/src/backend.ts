@@ -34,6 +34,12 @@ interface QqntBackendOptions {
   logger: Logger;
 }
 
+interface MessagePeer {
+  chatType: number;
+  peerUid: string;
+  guildId: string;
+}
+
 interface PendingSend {
   resolve: (raw: RawMessage) => void;
   reject: (error: Error) => void;
@@ -46,7 +52,7 @@ interface PendingSend {
  */
 export class QqntBackend implements Backend {
   readonly name = 'qqnt';
-  readonly version = '0.1.0';
+  readonly version = '0.2.0';
   readonly selfId: number;
   readonly capabilities: ReadonlySet<Capability> = new Set<Capability>([
     'text',
@@ -100,6 +106,7 @@ export class QqntBackend implements Backend {
   private readonly ids = new MessageIdRegistry();
   private readonly messages = new Map<number, RawMessage>();
   private readonly messageOrder: number[] = [];
+  private readonly messagePeers = new Map<number, MessagePeer>();
   private readonly byMsgId = new Map<string, RawMessage>();
   private readonly bySeq = new Map<string, RawMessage>();
   private readonly seen = new Set<string>();
@@ -504,9 +511,25 @@ export class QqntBackend implements Backend {
     return null;
   }
 
-  private getMessage(params: BackendActionParams): Record<string, unknown> {
+  private async getMessage(params: BackendActionParams): Promise<Record<string, unknown>> {
     const id = requiredId(params.message_id, 'message_id');
-    const raw = this.messages.get(id);
+    let raw = this.messages.get(id);
+    if (!raw) {
+      // 缓存没有时，尝试用 QQ 的消息接口拉取历史消息。回复消息的
+      // replyElement 里有目标 msgId，收到回复时已经记下了它属于哪个 peer。
+      const internalId = this.ids.toInternal(id);
+      const peer = this.messagePeers.get(id);
+      const service = this.msgService();
+      if (internalId && peer && typeof service?.getMsgsByMsgId === 'function') {
+        try {
+          const result = await service.getMsgsByMsgId(peer, [internalId]);
+          raw = result?.msgList?.[0] as RawMessage | undefined;
+          if (raw) this.register(raw);
+        } catch (error) {
+          this.logger.debug(`get_msg 从 QQ 拉取 ${id} 失败：${(error as Error).message}`);
+        }
+      }
+    }
     if (!raw) throw ActionError.notFound(`消息 ${id} 不在缓存中`);
     return rawToMessageInfo(raw, this.context());
   }
@@ -802,8 +825,12 @@ export class QqntBackend implements Backend {
   }
 
   private register(raw: RawMessage): void {
+    // 先记录 reply 目标，即使当前消息本身没有 msgId，也能让 get_msg 找到
+    // 被回复消息所属的群 / 好友。
+    this.rememberReplyTargets(raw);
     if (!raw.msgId) return;
     const id = this.ids.toOneBot(raw.msgId);
+    this.rememberPeer(id, raw);
     if (!this.messages.has(id)) {
       this.messages.set(id, raw);
       this.messageOrder.push(id);
@@ -817,6 +844,27 @@ export class QqntBackend implements Backend {
     if (raw.senderUid && raw.senderUin) {
       this.uidToUin.set(raw.senderUid, Number(raw.senderUin));
       this.uinToUid.set(Number(raw.senderUin), raw.senderUid);
+    }
+  }
+
+  private rememberPeer(oneBotId: number, raw: RawMessage): void {
+    if (!raw.peerUid) return;
+    this.messagePeers.set(oneBotId, {
+      chatType: raw.chatType,
+      peerUid: raw.peerUid,
+      guildId: raw.guildId ?? '',
+    });
+    if (this.messagePeers.size > 5000) {
+      const oldest = this.messagePeers.keys().next().value;
+      if (oldest !== undefined) this.messagePeers.delete(oldest);
+    }
+  }
+
+  private rememberReplyTargets(raw: RawMessage): void {
+    for (const element of raw.elements ?? []) {
+      const replyId = element.replyElement?.replayMsgId;
+      if (!replyId) continue;
+      this.rememberPeer(this.ids.toOneBot(replyId), raw);
     }
   }
 

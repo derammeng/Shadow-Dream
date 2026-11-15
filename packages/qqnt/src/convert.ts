@@ -359,7 +359,7 @@ function elementId(): string {
 /**
  * OneBot 消息段 → NTQQ sendMsg 元素。
  *
- * 0.1 支持 text / at / face / reply / json / mface。媒体类需要 highway
+ * 0.2 支持 text / at / face / reply / json / mface。媒体类需要 highway
  * 上传，直接塞本地路径不会成功，因此明确返回 1401，而不是发出一条坏消息。
  */
 export async function messageToElements(

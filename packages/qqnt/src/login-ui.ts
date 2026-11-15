@@ -7,6 +7,7 @@ import {
   checkToken,
   clearWebUiSession,
   hasWebUiSession,
+  httpUrl,
   issueWebUiSession,
   recordWebUiLoginFailure,
   resetWebUiLoginFailures,
@@ -76,6 +77,24 @@ const AUTH_PAGE = `<!doctype html>
   var input = document.getElementById('token');
   var button = document.getElementById('submit');
   var msg = document.getElementById('msg');
+  function waitForPanel(timeoutMs, fallback) {
+    var started = Date.now();
+    var timer = setInterval(async function () {
+      try {
+        var res = await fetch('/health', { cache: 'no-store' });
+        var data = await res.json();
+        if (data && data.app && data.app !== 'shadowdream-login') {
+          clearInterval(timer);
+          location.replace('/webui/');
+          return;
+        }
+      } catch (error) {}
+      if (Date.now() - started >= timeoutMs) {
+        clearInterval(timer);
+        if (fallback) fallback();
+      }
+    }, 800);
+  }
   form.addEventListener('submit', async function (event) {
     event.preventDefault();
     var token = input.value.trim();
@@ -89,7 +108,27 @@ const AUTH_PAGE = `<!doctype html>
         body: JSON.stringify({ token: token })
       });
       var data = await res.json();
-      if (res.ok && data.ok) { location.replace('/webui/'); return; }
+      if (res.ok && data.ok) {
+        msg.style.color = '#38bdf8';
+        msg.textContent = '正在检查登录状态…';
+        waitForPanel(6000, async function () {
+          msg.textContent = '正在恢复上次登录…';
+          try {
+            var auto = await fetch('/webui/api/login/auto', { method: 'POST' });
+            var result = await auto.json();
+            if (auto.ok && result.ok) {
+              msg.textContent = result.message || '正在恢复上次登录…';
+              waitForPanel(30000, function () { location.replace('/webui/'); });
+            } else {
+              msg.textContent = result.message || '账号可能已下线，请扫码登录';
+              waitForPanel(6000, function () { location.replace('/webui/'); });
+            }
+          } catch (error) {
+            location.replace('/webui/');
+          }
+        });
+        return;
+      }
       msg.textContent = data.message || 'token 不正确';
     } catch (error) {
       msg.textContent = '登录请求失败：' + (error.message || error);
@@ -178,10 +217,7 @@ export class LoginUi {
   }
 
   get url(): string {
-    const host = this.options.host === '0.0.0.0' || this.options.host === '::'
-      ? '127.0.0.1'
-      : this.options.host;
-    return `http://${host}:${this.options.port}/webui/`;
+    return `${httpUrl(this.options.host, this.options.port)}/webui/`;
   }
 
   async start(): Promise<boolean> {
@@ -331,6 +367,36 @@ export class LoginUi {
     }
   }
 
+  private async autoLoginSaved(): Promise<{
+    ok: boolean;
+    pending?: boolean;
+    uin?: string;
+    message?: string;
+  }> {
+    if (this.state.phase === 'success') {
+      return { ok: true, pending: true, message: '正在进入控制台…' };
+    }
+    if (this.state.accounts.length === 0) await this.loadAccounts();
+    const account = this.state.accounts.find(item => item.isQuickLogin || item.isAutoLogin)
+      ?? this.state.accounts[0];
+    if (!account?.uin) {
+      return { ok: false, message: '没有可恢复的登录账号，请扫码登录' };
+    }
+    if (!this.loginService) {
+      return { ok: false, message: 'QQ 登录服务尚未连接，请稍后扫码' };
+    }
+    const result = await this.quickLogin(account.uin);
+    if (!result.ok) {
+      return { ok: false, message: result.message || '账号可能已下线，请扫码登录' };
+    }
+    return {
+      ok: true,
+      pending: true,
+      uin: account.uin,
+      message: `正在恢复 QQ ${account.uin} 的登录…`,
+    };
+  }
+
   private requestQr(): boolean {
     try {
       const accepted = this.loginService?.getQRCodePicture?.();
@@ -409,6 +475,10 @@ export class LoginUi {
       res.end(JSON.stringify({ ok: false, message: '请先登录 WebUI' }));
       return;
     }
+    if (url.pathname === '/webui/api/login/auto' && req.method === 'POST') {
+      void this.handleAutoLogin(req, res);
+      return;
+    }
     if (url.pathname === '/health') {
       this.json(res, { status: 'ok', app: 'shadowdream-login' });
       return;
@@ -467,6 +537,14 @@ export class LoginUi {
     } catch {
       res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
       res.end(JSON.stringify({ ok: false, message: '登录参数错误' }));
+    }
+  }
+
+  private async handleAutoLogin(_req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
+    try {
+      this.json(res, await this.autoLoginSaved());
+    } catch (error) {
+      this.json(res, { ok: false, message: (error as Error).message || '自动登录请求失败' });
     }
   }
 

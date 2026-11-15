@@ -1,6 +1,6 @@
 {
   "name": "shadowdream",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Shadow Dream · 把 QQ 变成 OneBot 11 的轻量运行时",

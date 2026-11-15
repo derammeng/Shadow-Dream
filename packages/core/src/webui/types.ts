@@ -3,6 +3,7 @@ import type { ShadowDreamConfig } from '../config/schema.js';
 import type { ActionResult, BotStatus } from '../types/onebot.js';
 import type { SimulationInput } from '../types/backend.js';
 import type { LogEntry } from '../util/logger.js';
+import type { UpdateApplyResult, UpdateCheckResult } from '../update/index.js';
 
 export interface WebUiOverview {
   app: {
@@ -74,4 +75,6 @@ export interface WebUiHost {
   ): Promise<ConfigApplyResult>;
   reloadConfig(): Promise<ConfigApplyResult>;
   restartTransports(): Promise<void>;
+  checkUpdate(): Promise<UpdateCheckResult>;
+  applyUpdate(): Promise<UpdateApplyResult>;
 }

@@ -22,6 +22,8 @@ import { HttpTransport } from './transport/http.js';
 import type { ActionExecutor } from './transport/types.js';
 import { ReverseWsTransport, WsServerTransport } from './transport/ws.js';
 import { logBus, type Logger, type LogEntry } from './util/logger.js';
+import { wsUrl } from './util/network.js';
+import { applyUpdate as applyShadowDreamUpdate, checkUpdate as checkShadowDreamUpdate } from './update/index.js';
 import type { WebUiHost, WebUiOverview } from './webui/types.js';
 import type { Backend, Capability } from './types/backend.js';
 
@@ -31,7 +33,7 @@ export interface ShadowDreamBotOptions {
   logger: Logger;
   appName?: string;
   appVersion?: string;
-  /** 配置文件路径；设置后 WebUI 可保存配置并监听文件热更新。 */
+  /** 配置文件路径；设置后 WebUI 可保存配置并监听文件自动重载。 */
   configPath?: string;
   /** 默认 true；显式 false 可关闭文件监听。 */
   watchConfig?: boolean;
@@ -117,7 +119,7 @@ export class ShadowDreamBot implements ActionExecutor, WebUiHost {
     this.backend = options.backend;
     this.logger = options.logger;
     this.appName = options.appName ?? 'shadowdream';
-    this.appVersion = options.appVersion ?? '0.1.0';
+    this.appVersion = options.appVersion ?? '0.2.0';
     this.configPath = options.configPath;
     this.watchConfig = options.watchConfig !== false;
     this.lastAppliedConfig = JSON.stringify(this.config);
@@ -342,7 +344,7 @@ export class ShadowDreamBot implements ActionExecutor, WebUiHost {
       }
 
       this.applyLiveSettings();
-      this.logger.info('配置已热更新');
+      this.logger.info('配置已自动重载');
       return {
         configPath: this.configPath ?? '',
         networkChanged: false,
@@ -377,6 +379,14 @@ export class ShadowDreamBot implements ActionExecutor, WebUiHost {
     }
   }
 
+  checkUpdate() {
+    return checkShadowDreamUpdate();
+  }
+
+  applyUpdate() {
+    return applyShadowDreamUpdate();
+  }
+
   private applyLiveSettings(): void {
     this.httpPostTransport = new HttpPostTransport({
       targets: this.config.httpPost,
@@ -408,7 +418,7 @@ export class ShadowDreamBot implements ActionExecutor, WebUiHost {
         if (curr.mtimeMs === prev.mtimeMs) return;
         void this.handleConfigFileChanged();
       });
-      this.logger.info(`配置热更新已开启：${this.configPath}`);
+      this.logger.info(`配置自动重载已开启：${this.configPath}`);
     } catch (error) {
       this.logger.warn(`无法监听配置文件：${(error as Error).message}`);
     }
@@ -425,10 +435,10 @@ export class ShadowDreamBot implements ActionExecutor, WebUiHost {
     try {
       const next = loadConfig({ file: this.configPath });
       if (JSON.stringify(next) === this.lastAppliedConfig) return;
-      this.logger.info('检测到配置文件变化，正在热更新…');
+      this.logger.info('检测到配置文件变化，正在自动重载…');
       await this.applyConfig(next, { persist: false, source: 'file' });
     } catch (error) {
-      this.logger.error(`配置文件热更新失败：${(error as Error).message}`);
+      this.logger.error(`配置文件自动重载失败：${(error as Error).message}`);
     }
   }
 
@@ -504,9 +514,9 @@ export class ShadowDreamBot implements ActionExecutor, WebUiHost {
     const httpUrl = this.httpTransport?.url ?? '未启用';
     const wsServers = this.wsServerConfigs().map((config, index) => {
       const running = this.wsTransports.find(item => item.index === index);
-      const host = config.host === '0.0.0.0' || config.host === '::' ? '127.0.0.1' : config.host;
+      const suffix = config.path === '/' ? '' : config.path;
       const url = running?.transport.url
-        ?? `ws://${host}:${config.port}${config.path === '/' ? '' : config.path}`;
+        ?? wsUrl(config.host, config.port, suffix);
       return {
         name: config.name ?? `WebSocket ${index + 1}`,
         url,

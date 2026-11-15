@@ -7,6 +7,7 @@
 import './segment.test.js';
 import './message-id.test.js';
 import './config.test.js';
+import './network.test.js';
 import './page.test.js';
 import './http.test.js';
 import './http-post.test.js';

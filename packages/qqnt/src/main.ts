@@ -116,7 +116,7 @@ async function tryStart(): Promise<void> {
       backend,
       logger,
       appName: 'shadowdream',
-      appVersion: '0.1.0',
+      appVersion: '0.2.0',
       configPath: configPath(),
     });
     await bot.start();

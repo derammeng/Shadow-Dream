@@ -73,6 +73,26 @@ function makeHarness() {
       calls.push({ action: 'recallMsg', peer, ids });
       return { result: 0 };
     },
+    async getMsgsByMsgId(peer, ids) {
+      calls.push({ action: 'getMsgsByMsgId', peer, ids });
+      return {
+        result: 0,
+        msgList: ids.map(id => makeRaw({
+          msgId: id,
+          msgSeq: '99',
+          chatType: peer.chatType,
+          peerUid: peer.peerUid,
+          senderUid: 'u_friend',
+          senderUin: '20001',
+          sendNickName: '小梦',
+          elements: [{
+            elementType: 2,
+            elementId: 'img-1',
+            picElement: { originImageUrl: 'https://example.test/image.png', fileName: 'image.png' },
+          }],
+        })),
+      };
+    },
   };
 
   const groupService = {
@@ -229,5 +249,42 @@ test('QqntBackend 禁言使用秒数并返回失败码', async () => {
   assert.equal(call.list[0].uid, 'u_friend');
 
   // 群发送不再依赖群列表缓存，交给 QQ 自己校验目标；这里不再断言“群不存在”。
+  await backend.stop();
+});
+
+test('QqntBackend get_msg 能从回复目标拉取未缓存图片', async () => {
+  const harness = makeHarness();
+  const backend = new QqntBackend({
+    session: harness.session,
+    wrapper: {},
+    selfId: 10001,
+    selfUid: 'u_self',
+    selfNick: '影梦',
+    logger: core.createLogger('test', 'error'),
+  });
+  const events = [];
+  backend.onEvent(event => events.push(event));
+  await backend.start();
+
+  harness.emitIncoming(makeRaw({
+    msgId: 'reply-1',
+    elements: [
+      { elementType: 7, elementId: 'r1', replyElement: { replayMsgId: 'old-image-1' } },
+      { elementType: 1, elementId: 't1', textElement: { content: 'imgqa add', atType: 0 } },
+    ],
+  }));
+
+  const reply = events[0].message.find(segment => segment.type === 'reply');
+  assert.ok(reply);
+  const targetId = Number(reply.data.id);
+
+  const message = await backend.call('get_msg', { message_id: targetId }, { source: 'internal' });
+  assert.equal(message.message[0].type, 'image');
+  assert.equal(message.message[0].data.url, 'https://example.test/image.png');
+  const fetched = harness.calls.find(item => item.action === 'getMsgsByMsgId');
+  assert.ok(fetched);
+  assert.equal(fetched.peer.chatType, 2);
+  assert.equal(fetched.peer.peerUid, '30001');
+  assert.deepEqual(fetched.ids, ['old-image-1']);
   await backend.stop();
 });

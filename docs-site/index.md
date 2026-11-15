@@ -4,7 +4,7 @@ layout: home
 hero:
   name: Shadow Dream
   text: 影梦 · QQ → OneBot 11
-  tagline: 把 QQ 接入 OneBot 11 的轻量运行时。插件跑在 QQ 进程里，复用已有登录态；带 HTTP、WebSocket、WebUI 和可热更新的配置。
+  tagline: 把 QQ 接入 OneBot 11 的轻量运行时。插件跑在 QQ 进程里，复用已有登录态；带 HTTP、WebSocket、WebUI 和可自动重载的配置。当前版本 0.2.0。
   actions:
     - theme: brand
       text: 快速开始
@@ -22,7 +22,9 @@ features:
   - title: OneBot 11 全链路
     details: HTTP API、正向 / 反向 WebSocket、HTTP POST、心跳、CQ 码、消息 ID 映射，Koishi 等框架可以直接接入。
   - title: 自带 WebUI
-    details: 扫码 / 密码 / 一键登录，账号状态、网络配置、日志和调试台。公网部署时可用 token 保护。
+    details: 扫码 / 密码 / 一键登录，登录过 QQ 后自动恢复账号；账号状态、网络配置、日志、更新和调试台。公网部署时可用 token 保护。
+  - title: 一键启动与更新
+    details: Linux / Windows 一键启动；WebUI 或命令行检查更新、下载安装并自动重启，配置和插件 data 保留。
   - title: 适合小服务器
-    details: Linux + Xvfb 无头运行；配置热更新；插件和核心用 TypeScript 实现，问题通常能在日志里定位。
+    details: Linux + Xvfb 无头运行；配置自动重载；插件和核心用 TypeScript 实现，问题通常能在日志里定位。
 ---

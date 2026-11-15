@@ -10,6 +10,8 @@ http://127.0.0.1:3000/webui/
 
 WebUI 和 HTTP API 共用同一个监听地址，所以改 WebUI 的地址就是改 `http.host` / `http.port`。
 
+`http.host` 设为 `0.0.0.0` 或 `::` 时，启动日志和概览页会自动显示当前机器的局域网 IPv4（本机仍可用 `127.0.0.1`）；有多张网卡时以实际能访问的地址为准。改 host 后传输层会自动重启并打印新地址；启动横幅只在进程启动时打印，重启后会更新。
+
 ## 登录
 
 公网部署请设置 `http.webuiToken`。设置后，QQ 扫码登录页和控制台都会先要求输入 token，登录成功后使用 HttpOnly session cookie，刷新页面不需要重复输入。
@@ -29,6 +31,7 @@ WebUI 和 HTTP API 共用同一个监听地址，所以改 WebUI 的地址就是
 - cookie：`shadowdream_webui`，HttpOnly、SameSite=Lax、7 天有效；HTTPS 反代下自动加 Secure；
 - 右上角「退出」会清除 session；
 - 同一 session 在 QQ 登录页和登录后的控制台通用；
+- 之前登录过 QQ 时，token 通过后会自动恢复上次账号并直接进入控制台；只有没有可恢复账号、账号下线或恢复失败时才显示扫码页；
 - 登录失败按来源 IP 限速，一分钟内最多 10 次。
 
 旧的 `http.accessToken` 仍然用于 OneBot HTTP API；只设置它时 WebUI 也会要求用它登录。
@@ -40,7 +43,7 @@ WebUI 和 HTTP API 共用同一个监听地址，所以改 WebUI 的地址就是
 - 账号头像 / 昵称 / QQ 号 / 在线状态；
 - 运行时间、消息收发、WS / 反向 WS 连接数；
 - HTTP / 多个正向 WS / WebUI / HTTP POST / 反向 WS 端点；
-- 后端能力、配置路径、热更新状态。
+- 后端能力、配置路径、自动重载状态。
 
 ### 网络与反代
 
@@ -52,7 +55,7 @@ WebUI 和 HTTP API 共用同一个监听地址，所以改 WebUI 的地址就是
 - HTTP POST 列表：URL + secret；
 - **反向 WebSocket** 列表：URL + token + 重连间隔。
 
-「保存并热更新」：
+「保存并应用」：
 
 - 只改 token / HTTP POST / 反向 WS / 心跳 / 日志级别 → 立即应用；
 - 改 HTTP / 任一 WebSocket 的 host / port → 约 100ms 后自动重启传输层；
@@ -86,9 +89,8 @@ WebUI 和 HTTP API 共用同一个监听地址，所以改 WebUI 的地址就是
 登录说明：
 
 - `mock`：内置模拟账号 10001，无需登录；
-- `qqnt`：登录由 QQ 客户端管理，Shadow Dream 只复用已登录的 session，不保存密码、不展示二维码。
-
-真正的「WebUI 扫码登录」需要接入 QQNT 的登录服务，并且会和 QQ 自己的登录窗口竞争；当前版本刻意不做。
+- `qqnt`：未登录时，WebUI 通过 QQ 自己的 `NodeIKernelLoginService` 显示扫码 / 密码 / 一键登录；登录后只复用 session，不保存密码；
+- 登录过 QQ 后，token 通过时会先用保存的账号自动恢复登录，成功直接进入控制台；只有账号下线、没有可恢复账号或恢复失败时才显示扫码页。
 
 ### 调试台
 
@@ -106,7 +108,7 @@ WebUI 和 HTTP API 共用同一个监听地址，所以改 WebUI 的地址就是
 
 ### 关于
 
-版本、后端、配置文件、热更新状态和安全提示。
+版本、后端、配置文件、自动重载状态和安全提示。
 
 ## 自动化接口
 
@@ -199,7 +201,7 @@ server {
 
 session 已过期，或服务端刚改过 `webuiToken`。刷新页面重新输入 token，或点右上角「退出」后重新登录。
 
-### 文件修改没有热更新
+### 文件修改没有自动重载
 
 - 配置里必须有 `http` 和 `ws` 段；
 - 文件必须是合法 JSON（支持 UTF-8 BOM）；

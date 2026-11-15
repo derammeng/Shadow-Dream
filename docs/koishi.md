@@ -120,4 +120,4 @@ ss -lntp | grep 3001
 
 ### Koishi 改了 `koishi.yml` 必须重启
 
-Koishi 的插件配置不是全部热更新；改完 adapter 配置后重启 Koishi。
+Koishi 的插件配置不是全部自动重载；改完 adapter 配置后重启 Koishi。

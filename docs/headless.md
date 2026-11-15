@@ -4,6 +4,19 @@ Shadow Dream 的 `qqnt` 后端跑在 QQ 主进程里，所以「无头」不是�
 
 Linux QQ 是 Electron 应用，仍然需要 X11/Wayland。服务器上用 **Xvfb** 提供虚拟显示即可：QQ 以为自己有一个窗口，登录服务、LiteLoader 和插件都正常加载，二维码则通过 WebUI 显示。
 
+## 一键启动
+
+仓库根目录的 `start-shadowdream.sh` 会检测 QQ、LiteLoader profile 和插件，启动 Xvfb + QQ，并在 WebUI 就绪后打印地址和 token：
+
+```bash
+bash start-shadowdream.sh
+bash start-shadowdream.sh --check   # 只检查，不启动
+bash start-shadowdream.sh --check-update
+bash start-shadowdream.sh --update  # 更新并自动重启
+```
+
+`Ctrl+C` 停止。下面是手动步骤，便于排故。
+
 ## 1. 安装依赖
 
 Debian / Ubuntu：

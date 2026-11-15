@@ -1,5 +1,29 @@
 # 常见问题
 
+## 一键安装时精简包 404 / 下载失败
+
+精简包由 GitHub Actions 在每次 `main` 更新后自动发布到 `install-latest` Release。刚推送时可能还没生成，脚本会自动回退到完整源码包；也可以手动指定完整源码包：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/derammeng/Shadow-Dream/main/scripts/bootstrap.sh \
+  | bash -s -- --source full
+```
+
+Windows 是在一键命令后加 `-Source full`。私有仓库需要加 `--github-token`（Windows `-GithubToken`）。如果 GitHub 本身访问不稳定，可以用 `--bundle-url` / `--archive-url` 指向镜像或自建地址。
+
+## 一键更新显示“已经是最新版本”
+
+- 更新检查读的是 GitHub Release `install-latest` 里的 `install-bundle.json`，不是 `main` 分支最新提交；刚推送后要等 GitHub Actions 完成发布；
+- 确认当前目录的 `install-bundle.json` 存在；没有时会显示本地版本未知；
+- 想强制重装可以运行 `bash scripts/update-shadowdream.sh --force`，但会重新构建并重启 QQ。
+
+## 修改监听地址后仍显示 127.0.0.1
+
+- 启动横幅只在进程启动时打印，改完 `http.host` 要重启进程才会刷新；
+- 如果在 WebUI 里保存，传输层会自动重启，日志会打印新的监听地址；
+- `http.host` 填 `0.0.0.0` / `::` 时，日志和概览页会显示自动识别的局域网 IPv4；
+- 有多张网卡时，直接填具体的局域网 IP 最稳。
+
 ## 3000 端口能监听，但浏览器超时
 
 先区分「窗口打不开」和「QQ 主线程卡住」：

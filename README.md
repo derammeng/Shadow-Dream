@@ -1,6 +1,8 @@
 # Shadow Dream · 影梦
 
 > 把 QQ 接进一场 OneBot 11 的影梦。
+>
+> 当前版本：**0.2.0**
 
 Shadow Dream 是一个新的 QQ → OneBot 11 运行时。它把「协议端」和「传输层」拆开：
 
@@ -8,7 +10,9 @@ Shadow Dream 是一个新的 QQ → OneBot 11 运行时。它把「协议端」�
 - **QQNT 插件**：作为 LiteLoaderQQNT 插件运行在 QQ 主进程里，复用 QQ 自己的登录态与 session，监听消息、调用发送接口。**不修改 `wrapper.node`，不注入 DLL，不接触密码 / 登录密钥。**
 - **模拟器**：内置一个会维护好友、群、成员、消息、撤回状态的假 QQ。没有 QQ 环境也能把整条 OneBot 链路跑起来、写测试、接 SDK。
 
-> 0.1 的状态：核心与模拟器已通过自动化测试和真实 HTTP / WebSocket 联调；QQNT 插件按 LiteLoader 生命周期实现，属于**实验性**后端。媒体发送（图片 / 语音 / 视频 / 文件）需要 NTQQ 的 highway 上传通道，0.1 暂未实现，会明确返回 1401，而不是发坏消息。
+> 0.2 的状态：核心与模拟器已通过自动化测试和真实 HTTP / WebSocket 联调；QQNT 插件按 LiteLoader 生命周期实现，属于**实验性**后端。媒体发送（图片 / 语音 / 视频 / 文件）需要 NTQQ 的 highway 上传通道，0.2 暂未实现，会明确返回 1401，而不是发坏消息。
+>
+> 版本变更见 [CHANGELOG.md](CHANGELOG.md)。
 
 ---
 
@@ -24,7 +28,7 @@ Shadow Dream 换了一个切面：
 | 协议实现 | 自己接管 packet / 登录 / 加密 | 复用 QQ 已经登录好的 wrapper 与 session |
 | 版本敏感点 | native DLL、offset、wrapper 补丁 | QQ wrapper 的 JS API 形状 |
 | 出问题时的定位 | native 崩溃、注入失败 | 插件日志 / Node 异常，通常可读 |
-| 核心能力 | 完整 | 0.1 覆盖文本、表情、@、回复、群管理；媒体待补 |
+| 核心能力 | 完整 | 0.2 覆盖文本、表情、@、回复、群管理；媒体待补 |
 
 它不是 NapCat 的 fork，也没有复制 NapCat 的代码。参考文件夹里的 NapCatQQ / SnowLuma 只用于理解 NTQQ wrapper 的公开 API 形状和 OneBot 行为；Shadow Dream 的传输层、消息模型、模拟器、插件生命周期都是重新实现的。
 
@@ -55,15 +59,15 @@ Shadow Dream 换了一个切面：
 - **日志**：级别过滤、搜索、暂停、下载；
 - **关于**：版本、配置路径、安全提示。
 
-网络页的「保存并热更新」会写入配置文件并立即应用：
+网络页的「保存并应用」会写入配置文件并立即应用：
 
 - 只改 token、HTTP POST、反向 WS、心跳、日志级别：不重启，直接生效；
 - 改 HTTP / 任一 WebSocket 的 host / port：约 100ms 后自动重启传输层，WebUI 会提示新地址；
-- 直接修改 `config/shadowdream.json` 也会触发热更新（文件监听）。
+- 直接修改 `config/shadowdream.json` 也会触发自动重载（文件监听）。
 
 设置了 `webuiToken` 时，QQ 登录页和控制台都会先显示 token 登录页；登录后使用 HttpOnly session cookie。`webuiToken` 为空时沿用 `accessToken`。
 
-> 「账号登录」：mock 显示模拟账号；QQNT 未登录时，WebUI 会通过 QQ 自己的 `NodeIKernelLoginService` 显示登录二维码，扫码后自动切到完整控制台。二维码由本机 QQ 生成，不经过密码或第三方接口。
+> 「账号登录」：mock 显示模拟账号；QQNT 未登录时，WebUI 会通过 QQ 自己的 `NodeIKernelLoginService` 显示登录二维码，扫码后自动切到完整控制台。之前登录过 QQ 的情况下，token 通过后会先用保存账号自动恢复登录，成功就直接进控制台，只有账号下线或恢复失败才显示二维码。二维码由本机 QQ 生成，不经过密码或第三方接口。
 
 ![Shadow Dream WebUI](docs/webui.png)
 
@@ -78,9 +82,56 @@ Shadow Dream 换了一个切面：
 | 后端 | 用途 | 状态 |
 |---|---|---|
 | `mock` | 无 QQ 开发 / 测试 / 演示 | 可用，带完整假数据 |
-| `qqnt` | LiteLoaderQQNT 插件，真实 QQ | 实验性，0.1 |
+| `qqnt` | LiteLoaderQQNT 插件，真实 QQ | 实验性，0.2 |
 
 ---
+
+## 一键安装
+
+默认只拉取**精简安装包**（只含构建 / 运行需要的文件，不含文档站 / 知识库、截图和测试），安装目录、插件目录和 WebUI token 直接写在命令里：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/derammeng/Shadow-Dream/main/scripts/bootstrap.sh \
+  | bash -s -- \
+      --dir "$HOME/ShadowDream" \
+      --plugins-dir "$HOME/.local/share/LiteLoaderQQNT/plugins" \
+      --webui-token "你的20位token"
+```
+
+Windows PowerShell：
+
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/derammeng/Shadow-Dream/main/scripts/bootstrap.ps1))) `
+  -Dir "$env:USERPROFILE\ShadowDream" `
+  -PluginsDir "C:\path\to\LiteLoaderQQNT\plugins" `
+  -WebUiToken "你的20位token"
+```
+
+默认不会自动安装 QQ、LiteLoaderQQNT、Xvfb。需要时在 Linux 命令里额外加：
+
+```bash
+--install-qq --install-litelloader --install-xvfb
+```
+
+需要完整源码时加 `--source full`。参数、镜像和私有仓库说明见 [安装文档](https://derammeng.github.io/Shadow-Dream/guide/install)。
+
+安装完成后：
+
+- Windows 双击 `start-shadowdream.bat`（或运行 `start-shadowdream.bat --check`）；Shadow Dream 跑在 WSL 时用 `start-shadowdream.bat --wsl`；
+- Linux / WSL 运行 `bash start-shadowdream.sh`（`--check` 只检查路径）。
+
+Windows 会自动找 QQ、等待 WebUI 并打开浏览器（没检测到 Windows 插件时会自动尝试 WSL）；Linux 还会自动找 LiteLoader profile 和插件，必要时构建/部署，最后打印地址和 token。
+
+检查更新 / 一键更新：
+
+```bash
+bash start-shadowdream.sh --check-update
+bash start-shadowdream.sh --update
+```
+
+Windows 用 `start-shadowdream.bat --check-update` / `--update`。更新会保留配置和插件 data，更新完成后自动重启 Shadow Dream + QQNT。
+
+也可以直接打开 WebUI 侧边栏的「更新」页操作检查、下载和安装。
 
 ## 快速开始（不需要 QQ）
 
@@ -305,7 +356,7 @@ get_supported_actions   can_send_image          can_send_record
 get_cookies             get_csrf_token          get_credentials
 ```
 
-QQNT 后端 0.1 支持：
+QQNT 后端 0.2 支持：
 
 ```text
 send_private_msg        send_group_msg          send_msg
@@ -375,23 +426,22 @@ shadowdream/
 
 ## 已知限制
 
-- **QQNT 插件是 0.1 实验性后端**：不同 QQ / LiteLoader 版本的 wrapper 字段可能变化；欢迎带日志反馈。
-- **媒体发送未实现**：图片、语音、视频、文件发送需要 highway 上传，0.1 会返回 1401。接收侧会把图片 / 语音 / 视频 / 文件转换成对应的 OneBot 段（本地路径 / URL 视 QQ 缓存而定）。
-- **不支持扫码登录**：插件复用 QQ 自己的登录界面；Shadow Dream 不接管二维码。
+- **QQNT 插件是 0.2 实验性后端**：不同 QQ / LiteLoader 版本的 wrapper 字段可能变化；欢迎带日志反馈。
+- **媒体发送未实现**：图片、语音、视频、文件发送需要 highway 上传，0.2 会返回 1401。接收侧会把图片 / 语音 / 视频 / 文件转换成对应的 OneBot 段（本地路径 / URL 视 QQ 缓存而定）。
+- **扫码登录**：未登录时 WebUI 会通过 QQ 自己的登录服务显示二维码；登录过 QQ 后，token 通过会优先自动恢复账号，只有账号下线或恢复失败才显示二维码。
 - **群公告、合并转发、表情回应、频道 /  guild 等**尚未实现。
-- **平台**：开发和测试以 Windows + Node 24 为主；macOS / Linux 理论上可用，但未实测。
+- **平台**：Windows + Node 24 和 Linux 无头运行均已实测；macOS 理论可用，但未实测。
 - **合规**：仅用于个人学习与自建机器人。使用前请阅读 QQ 相关协议与当地法律法规；不要用于骚扰、批量营销或其他违规用途。项目与腾讯无关。
 
 ---
 
 ## Roadmap
 
-- **0.1.x（已完成）**：WebUI 概览 / 网络 / 账号 / 调试 / 日志、反向 WS 编辑、配置保存与文件热更新；
-- **0.2**：QQNT 媒体发送（highway 上传）、图片 / 语音 / 视频 / 文件；
-- **0.2**：灰条事件（群成员变动、拍一拍、撤回操作者）、合并转发；
-- **0.2**：WebUI 扫码登录（pre-login 服务，和 QQ 客户端二选一）；
-- **0.3**：多账号 / 多后端路由、OneBot 12 适配层；
-- 长期：插件自动更新、更完整的账号生命周期管理。
+- **0.2（已完成）**：一键启动、WebUI 更新页 / CLI 更新、自动恢复 QQ 登录、可选自动安装 QQ / LiteLoader / Xvfb、精简安装包、局域网地址显示、get_msg 1404 修复；
+- **0.3**：QQNT 媒体发送（highway 上传）、图片 / 语音 / 视频 / 文件；
+- **0.3**：灰条事件（群成员变动、拍一拍、撤回操作者）、合并转发；
+- **0.4**：多账号 / 多后端路由、OneBot 12 适配层；
+- 长期：更完整的账号生命周期管理、插件自动更新。
 
 ---
 

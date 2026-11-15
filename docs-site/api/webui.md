@@ -45,6 +45,23 @@ POST /webui/api/logout
 | GET | `/webui/api/logs?since=0&limit=150` | 日志 |
 | POST | `/webui/api/action` | 调用任意 OneBot action |
 | POST | `/webui/api/simulate` | 注入模拟消息（mock） |
+| GET | `/webui/api/update/check` | 检查远端版本 |
+| POST | `/webui/api/update/apply` | 下载并安装更新（会重启 QQ） |
+
+## 更新
+
+```http
+GET /webui/api/update/check
+```
+
+返回 `supported`、`root`、`current`、`latest`、`updateAvailable` 和错误信息。更新源是 Release `install-latest` 里的 `install-bundle.json`。
+
+```http
+POST /webui/api/update/apply
+```
+
+触发 `scripts/update-shadowdream.sh --update --delay 2`。接口返回后 QQ 会退出并自动重启，WebUI 会短暂断开；更新日志在源码目录的 `logs/webui-update.log`。
+
 
 ## 保存配置
 

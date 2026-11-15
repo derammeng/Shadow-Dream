@@ -41,7 +41,7 @@ fs.writeFileSync(
   path.join(coreTarget, 'package.json'),
   `${JSON.stringify({
     name: '@shadowdream/core',
-    version: '0.1.0',
+    version: '0.2.0',
     private: true,
     type: 'commonjs',
     main: 'index.js',

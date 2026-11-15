@@ -94,7 +94,7 @@ config.json      # HTTP / WS / token
 }
 ```
 
-`backend.type` 会被强制为 `qqnt`。HTTP / WS / 反向 WS / token 等配置可以在 WebUI 的「网络与反代」里保存并热更新；改 host / port 会重启传输层，但不需要重启 QQ。插件代码本身更新仍然需要重启 QQ 或重新加载插件。
+`backend.type` 会被强制为 `qqnt`。HTTP / WS / 反向 WS / token 等配置可以在 WebUI 的「网络与反代」里保存并应用；改 host / port 会重启传输层，但不需要重启 QQ。插件代码本身更新仍然需要重启 QQ 或重新加载插件。
 
 ## 账号与登录
 

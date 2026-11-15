@@ -26,14 +26,18 @@ Shadow Dream 不复用它们的 native hook，也不修改 `wrapper.node`：
 - 私聊 / 群聊消息收发；
 - HTTP API、正向 WS、反向 WS、HTTP POST；
 - 生命周期、心跳、CQ 码；
-- WebUI 扫码 / 密码 / 一键登录；
-- 配置热更新；
-- Linux Xvfb 无头运行。
+- WebUI 扫码 / 密码 / 一键登录，登录过 QQ 后自动恢复账号；
+- 配置自动重载；
+- Linux Xvfb 无头运行；
+- Linux / Windows 一键启动；
+- WebUI / CLI 检查更新、下载安装并自动重启；
+- 安装时可选择自动安装 QQ、LiteLoaderQQNT、Xvfb。
 
-媒体（图片、语音、视频、文件）在 0.1 中尚未实现，会明确返回 `1401`，不会静默发坏消息。
+媒体（图片、语音、视频、文件）在 0.2 中尚未实现，会明确返回 `1401`，不会静默发坏消息。
 
 ## 下一步
 
 - [安装 Shadow Dream](/guide/install)
 - [启动并打开 WebUI](/guide/start)
 - [遇到问题](/guide/troubleshooting)
+- [更新日志](https://github.com/derammeng/Shadow-Dream/blob/main/CHANGELOG.md)

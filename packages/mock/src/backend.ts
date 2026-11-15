@@ -69,7 +69,7 @@ const SELF_ID = 10001;
  */
 export class MockBackend implements Backend {
   readonly name = 'mock';
-  readonly version = '0.1.0';
+  readonly version = '0.2.0';
   readonly selfId = SELF_ID;
   readonly capabilities: ReadonlySet<Capability> = new Set<Capability>([
     'text',

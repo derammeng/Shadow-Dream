@@ -151,7 +151,7 @@ Shadow Dream 启动后主动连接 `reverseWs[].url`，推送事件；业务端�
 ```http
 X-Self-ID: 10001
 X-Signature: sha1=...
-User-Agent: Shadow Dream/0.1.0
+User-Agent: Shadow Dream/0.2.0
 ```
 
 签名：
@@ -166,7 +166,7 @@ hex(HMAC-SHA1(secret, rawBody))
 
 `meta_event_type: "heartbeat"`，默认 30 秒。`intervalMs` 范围 1000–3600000。心跳会走 WS 和 HTTP POST，但不会写日志，避免刷屏。
 
-## 热更新
+## 自动重载
 
 配置文件会被监听（`fs.watchFile`，约 1.2 秒轮询）。改完保存后会自动应用：
 

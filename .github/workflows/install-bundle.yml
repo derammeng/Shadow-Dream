@@ -1,0 +1,40 @@
+name: Publish install bundle
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: install-bundle
+  cancel-in-progress: true
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build slim installer
+        run: node scripts/pack-slim.mjs
+      - name: Publish rolling release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if ! gh release view install-latest >/dev/null 2>&1; then
+            gh release create install-latest \
+              --title "Install bundle (rolling)" \
+              --notes "由 GitHub Actions 自动生成的 Shadow Dream 精简安装包，只包含构建和运行需要的文件。" \
+              --prerelease
+          fi
+          gh release upload install-latest \
+            dist/shadowdream-slim.tar.gz \
+            dist/shadowdream-slim.zip \
+            dist/install-bundle.json \
+            --clobber

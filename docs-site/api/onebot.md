@@ -75,4 +75,4 @@ set_group_kick
 - 私聊 / 群聊；
 - 回复、@、表情。
 
-完整列表见仓库 `docs/onebot-api.md`。
+完整 action 列表和参数见 WebUI「调试台」，或源码 `packages/core/src/types/onebot.ts`。
