@@ -27,28 +27,93 @@ const LOGIN_PAGE = `<!doctype html>
 <meta name="robots" content="noindex,nofollow" />
 <title>Shadow Dream · WebUI 登录</title>
 <style>
-  :root { color-scheme: dark; --bg:#070b14; --panel:#0e1626; --line:#1e2a42; --text:#e5edf8; --muted:#8ea0bb; --accent:#38bdf8; }
+  :root {
+    color-scheme: light;
+    --bg: #fdfbff; --text: #211a33; --text-2: #4c4466; --muted: #7b7394;
+    --line: #efe9fa; --line-strong: #e2d8f5; --accent: #6a4bf5;
+    --gradient: linear-gradient(118deg, #7a5cff 0%, #b06bff 42%, #ff7ab6 100%);
+    --shadow: 0 32px 80px rgba(60, 40, 120, 0.16);
+  }
   * { box-sizing: border-box; }
-  body { margin:0; min-height:100vh; display:grid; place-items:center; background:radial-gradient(900px 500px at 70% 0%, #11213a 0, var(--bg) 60%); color:var(--text); font-family:system-ui,"Segoe UI","Microsoft YaHei",sans-serif; }
-  .box { width:min(380px, calc(100vw - 32px)); background:rgba(14,22,38,.92); border:1px solid var(--line); border-radius:18px; padding:26px; box-shadow:0 30px 80px rgba(0,0,0,.45); }
-  .brand { display:flex; align-items:center; gap:10px; margin-bottom:18px; }
-  .logo { width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#38bdf8,#6366f1); display:grid; place-items:center; color:#06121f; font-weight:900; }
-  .brand b { font-size:14px; letter-spacing:.16em; }
-  .brand span { color:var(--muted); font-size:11px; display:block; letter-spacing:.06em; }
-  h1 { font-size:18px; margin:0 0 6px; }
-  p { color:var(--muted); font-size:12px; line-height:1.7; margin:0 0 16px; }
-  label { display:block; font-size:12px; color:var(--muted); margin:0 0 6px; }
-  input { width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:9px; background:#0a1220; color:var(--text); outline:none; font-family:ui-monospace,Consolas,monospace; }
-  input:focus { border-color:var(--accent); }
-  button { width:100%; margin-top:12px; border:0; border-radius:9px; padding:11px; background:linear-gradient(135deg,#38bdf8,#6366f1); color:#06121f; font-weight:700; cursor:pointer; }
-  button:disabled { opacity:.6; cursor:wait; }
-  .msg { min-height:18px; margin-top:10px; font-size:12px; color:#f87171; line-height:1.6; }
-  .foot { margin-top:18px; font-size:10px; color:#4b5b73; text-align:center; }
+  body {
+    margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px;
+    background:
+      radial-gradient(900px 520px at 88% -8%, rgba(255, 122, 182, 0.14), transparent 62%),
+      radial-gradient(760px 480px at 4% 0%, rgba(122, 92, 255, 0.14), transparent 60%),
+      var(--bg);
+    color: var(--text);
+    font-family: "Inter", "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .box {
+    width: min(400px, 100%); padding: 26px;
+    background: linear-gradient(170deg, #ffffff, #fbf7ff);
+    border: 1px solid var(--line-strong); border-radius: 24px;
+    box-shadow: var(--shadow);
+  }
+  .brand { display: flex; align-items: center; gap: 11px; margin-bottom: 20px; }
+  .logo {
+    width: 38px; height: 38px; border-radius: 12px; position: relative; flex: none;
+    background: var(--gradient);
+    box-shadow: 0 10px 24px rgba(122, 92, 255, 0.3);
+  }
+  .logo::after {
+    content: ""; position: absolute; inset: 9px; border-radius: 50%; background: #fff; opacity: 0.96;
+    -webkit-mask: radial-gradient(circle at 64% 36%, transparent 40%, #000 43%);
+    mask: radial-gradient(circle at 64% 36%, transparent 40%, #000 43%);
+  }
+  .brand b { font-size: 13px; letter-spacing: 0.1em; font-weight: 800; color: var(--text); }
+  .brand span { color: var(--muted); font-size: 11px; display: block; letter-spacing: 0.04em; margin-top: 2px; }
+  h1 { font-size: 21px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 6px; }
+  p { color: var(--muted); font-size: 12.5px; line-height: 1.7; margin: 0 0 18px; }
+  label { display: block; font-size: 11.5px; color: var(--muted); font-weight: 600; margin: 0 0 6px; }
+  input {
+    width: 100%; padding: 11px 13px; border: 1px solid var(--line-strong); border-radius: 12px;
+    background: #fdfbff; color: var(--text); outline: none;
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 13px;
+    transition: border-color 0.16s ease, box-shadow 0.16s ease;
+  }
+  input:focus { border-color: rgba(122, 92, 255, 0.5); box-shadow: 0 0 0 4px rgba(122, 92, 255, 0.1); }
+  button {
+    width: 100%; margin-top: 14px; border: 0; border-radius: 999px; padding: 12px;
+    background: var(--gradient); color: #fff; font-weight: 700; font-size: 14px; cursor: pointer;
+    box-shadow: 0 14px 30px -12px rgba(122, 92, 255, 0.7);
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+  }
+  button:hover { transform: translateY(-1px); box-shadow: 0 18px 34px -12px rgba(122, 92, 255, 0.8); }
+  button:disabled { opacity: 0.55; cursor: wait; transform: none; box-shadow: none; }
+  .msg { min-height: 18px; margin-top: 10px; font-size: 12px; color: #d8446f; line-height: 1.6; }
+  .foot {
+    margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--line);
+    font-size: 10.5px; color: var(--muted); text-align: center; letter-spacing: 0.04em;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --bg: #0d0a17; --text: #f6f1ff; --text-2: #cfc6e6; --muted: #948cab;
+      --line: #2a2242; --line-strong: #372d55; --accent: #b9a3ff;
+      --gradient: linear-gradient(118deg, #9a7bff 0%, #c58bff 42%, #ff92c4 100%);
+      --shadow: 0 32px 80px rgba(0, 0, 0, 0.6);
+    }
+    body {
+      background:
+        radial-gradient(900px 520px at 88% -8%, rgba(255, 122, 182, 0.16), transparent 62%),
+        radial-gradient(760px 480px at 4% 0%, rgba(122, 92, 255, 0.18), transparent 60%),
+        var(--bg);
+    }
+    .box { background: linear-gradient(170deg, #191228, #140f22); }
+    input, .pw-form input { background: #140f22; color: var(--text); }
+    .tabs { background: #140f22; }
+    .tab.active { background: #1f1734; color: var(--accent); }
+    .qr-refresh, .quick-card { background: #171128; }
+    .quick-avatar { background: rgba(154, 123, 255, 0.16); }
+    .foot { border-color: var(--line); }
+  }
 </style>
 </head>
 <body>
 <div class="box">
-  <div class="brand"><div class="logo">梦</div><div><b>SHADOW DREAM</b><span>影梦 · WebUI 登录</span></div></div>
+  <div class="brand"><div class="logo"></div><div><b>SHADOW DREAM</b><span>影梦 · WebUI 登录</span></div></div>
   <h1>输入访问 token</h1>
   <p>这个控制台已开启 token 登录。token 由服务端配置生成，不会显示在页面上。</p>
   <form id="form">

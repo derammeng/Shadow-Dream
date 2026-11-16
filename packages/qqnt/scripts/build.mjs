@@ -37,11 +37,15 @@ fs.cpSync(coreDist, coreTarget, {
   recursive: true,
   filter: source => !source.endsWith('.map'),
 });
+// 版本号从 core 的 package.json 读取，避免打包时写死版本导致漂移。
+const coreVersion = JSON.parse(
+  fs.readFileSync(path.join(repoRoot, 'packages', 'core', 'package.json'), 'utf8'),
+).version;
 fs.writeFileSync(
   path.join(coreTarget, 'package.json'),
   `${JSON.stringify({
     name: '@shadowdream/core',
-    version: '0.2.0',
+    version: coreVersion,
     private: true,
     type: 'commonjs',
     main: 'index.js',
@@ -49,9 +53,23 @@ fs.writeFileSync(
   'utf8',
 );
 
-// 3. ws 及其运行时依赖（ws 本身没有依赖）。
-const wsTarget = path.join(releaseRoot, 'node_modules', 'ws');
-fs.cpSync(wsSource, wsTarget, { recursive: true });
+// 3. 运行时依赖：ws 负责反向 WS，silk-wasm / mpg123-decoder 负责语音转码。
+//    插件跟着 QQ 主进程跑，不经过 npm 安装，所以必须把依赖整个打进去。
+const runtimeDependencies = [
+  'ws',
+  'silk-wasm',
+  'mpg123-decoder',
+  '@wasm-audio-decoders/common',
+  '@eshaz/web-worker',
+  'simple-yenc',
+];
+for (const name of runtimeDependencies) {
+  const source = path.join(repoRoot, 'node_modules', ...name.split('/'));
+  assertExists(source, `缺少运行时依赖 ${name}，请先在仓库根目录执行 npm install`);
+  const target = path.join(releaseRoot, 'node_modules', ...name.split('/'));
+  fs.mkdirSync(path.dirname(target), { recursive: true });
+  fs.cpSync(source, target, { recursive: true });
+}
 
 console.log(`插件已打包到：${releaseRoot}`);
 console.log('把 release/shadowdream 整个目录放到 LiteLoaderQQNT 的 plugins 目录即可。');

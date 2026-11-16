@@ -45,38 +45,48 @@ WebUI 和 HTTP API 共用同一个监听地址，所以改 WebUI 的地址就是
 - HTTP / 多个正向 WS / WebUI / HTTP POST / 反向 WS 端点；
 - 后端能力、配置路径、自动重载状态。
 
-### 网络与反代
+### 网络与推送
 
 可编辑：
 
 - HTTP：enabled、host、port、access token、CORS、WebUI 开关；
 - 心跳：enabled、intervalMs；
 - 日志级别；
-- HTTP POST 列表：URL + secret；
-- **反向 WebSocket** 列表：URL + token + 重连间隔。
+- HTTP POST 列表：URL + secret（留空的行会被忽略）。
+
+这一页是**一张整页表单**：任何输入都会把状态标成「有未保存的修改」，「保存并应用」才会生效；有未保存修改时切换页面会先确认，刷新按钮也不会冲掉表单。
 
 「保存并应用」：
 
-- 只改 token / HTTP POST / 反向 WS / 心跳 / 日志级别 → 立即应用；
-- 改 HTTP / 任一 WebSocket 的 host / port → 约 100ms 后自动重启传输层；
+- 只改 token / HTTP POST / 心跳 / 日志级别 → 立即应用；
+- 改 HTTP 的 host / port → 约 100ms 后自动重启传输层；
   - 如果 WebUI 端口变了，页面会提示新地址；
   - 如果 token 变了，页面会重新要求输入 token；
-- 「从磁盘重载」会重新读取 `config/shadowdream.json`；
-- 「重启连接」只重启 HTTP / WS / 反向 WS，不重启进程和后端。
+- 保存前会校验地址格式（HTTP POST 必须是 http/https），格式错误会标红并阻止保存；
+- 「放弃修改并重载」会丢弃表单改动，重新读取 `config/shadowdream.json`；
+- 「重启连接」不修改配置，只重启 HTTP / WS / 反向 WS。
 
 ### WebSocket
 
 ![WebSocket 管理](webui-ws.png)
 
-正向 WebSocket 有独立板块，每个地址一张卡片：
+正向与反向 WebSocket 都在这一页，各自一张卡片，改动都会**立即保存**并热重启。
+
+**正向 WebSocket**（QQ 作为服务端，业务端连进来）：
 
 - 显示：名称、启用开关、运行状态、URL、当前客户端数；
-- 操作：编辑、测试、删除；
+- 操作：启用开关、编辑、测试、删除；
 - 新建：名称、host、port、path、独立 token、启用开关；
-- 卡片开关会立即保存并热重启；
 - 「测试」会从浏览器建立一条 WS，发送 `get_status` 验证连接。
 
-每个端点对应 `wsServers[]` 里的一项。旧配置里的单个 `ws` 会自动迁移成一项。
+每个正向端点对应 `wsServers[]` 里的一项。旧配置里的单个 `ws` 会自动迁移成一项。
+
+**反向 WebSocket**（Shadow Dream 主动连出去）：
+
+- 显示：目标地址、重连间隔、是否设置 token；
+- 操作：编辑（地址 / token / 重连间隔）、删除；
+- 新建：目标地址（`ws(s)://`）+ token + 重连间隔；
+- 每个反向端点对应 `reverseWs[]` 里的一项，断线会按间隔自动重连。
 
 ### 账号
 

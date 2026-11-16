@@ -2,6 +2,66 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## 0.3.0 - 2026-11-16
+
+### 新增
+
+- **QQNT 媒体发送（图片 / 语音 / 视频 / 文件）**
+  - 图片：`image` 段支持本地路径、`file://`、`http(s)://`、`base64://`；识别 PNG / JPEG / GIF / WebP / BMP，把宽高、格式、MD5 写进 `picElement`；`sub_type: 1` 发送为表情包。
+  - 语音：`record` 段支持 SILK 直传，以及 WAV / MP3 自动转 SILK；非 24kHz 输入先重采样，自动写入时长；媒体消息的发送等待时间放宽到 60 秒。
+  - 视频：`video` 段支持 MP4 / MOV；自带一个最小的 MP4/MOV 容器解析器读取时长与分辨率，解析不到时用保守默认值；不引入 ffmpeg，封面写一张内置渐变 PNG，命名为 `<videoMd5>_0.png` 放进 `Video/<年月>/Thumb/`（QQ 按视频 md5 找封面）。
+  - 文件：`file` 段支持任意类型，`name` 作为 QQ 里显示的文件名；私聊与群聊都可用。
+  - 统一实现：文件写进 QQ 自己的富媒体缓存目录（`getRichMediaFilePathForGuild`），由 QQ 在 `sendMsg` 时完成上传，不修改 `wrapper.node`。
+- **依赖**
+  - 插件打包 `silk-wasm`、`mpg123-decoder` 及其运行时依赖；`build.mjs` 的插件版本从 `core/package.json` 读取，避免漂移。
+- **测试**
+  - 新增 `tests/media.test.mjs`：格式识别、来源解析、WAV 解析 / 重采样、SILK 编码、MP4 容器解析、默认封面生成与错误分支。
+  - `convert.test.mjs` / `backend.test.mjs` 覆盖媒体钩子与图片 / 语音 / 视频 / 文件四类 element 构造。
+
+### 修复
+
+- **启动可能卡死**：`refreshGroups` / `loadMembers` / `loadFriends` 先 `await` 原生调用，超时兜底在调用之后；原生调用不返回时插件会永远停在 bootstrap。
+  - 现在所有原生调用都套 `withTimeout`，超时后继续启动并打 debug 日志。
+- **WebUI 网络 / WebSocket 交互重排**
+  - 「网络与反代」改名「网络与推送」，页内去掉只做跳转的「正向 WebSocket」占位卡；
+  - 网络与推送改为明确的整页表单：脏状态提示、保存按钮按需启用、离开页面前确认、刷新不冲掉表单；
+  - 保存前校验 HTTP POST 地址格式，错误行标红并阻止保存；
+  - HTTP POST 行编辑加上列标题；
+  - 正向与反向 WebSocket 合并到「WebSocket」页：两段卡片列表，新增 / 编辑 / 删除都会立即保存并热重启；
+  - 反向端点从「网络与推送」的行编辑器改为卡片 + 弹窗（目标地址 / token / 重连间隔），与正向端点交互一致；
+  - 底部操作条改为实底悬浮，并给表单留出底部空间，避免盖住「添加」按钮。
+- **`get_group_list` 返回空、`get_group_info` 报 1404**：QQ 的 `onGroupListUpdate` 回调是两个参数 `(updateType, groupList)`，之前按单参数解析，列表永远拿不到；现在按真实签名解析，并支持 `updateType = 3` 的移除语义。
+- 群消息 / 发送过程中补最小群缓存的逻辑保持不变，避免刚登录时群操作用不了。
+
+### 变更
+
+- QQNT 后端能力集合新增 `image`、`record`、`video`、`file`；`can_send_image` / `can_send_record` 现在返回 `true`。
+- 发送媒体时不再抛 1401；四类媒体都走 QQ 富媒体缓存目录，由 QQ 自己上传。
+- **WebUI 视觉重构**：与文档站统一为马卡龙主题 —— 侧边栏、导航胶囊、渐变按钮、
+  卡片、表单、WebSocket 卡片、开关、日志控制台、弹窗与 toast 全部重做；
+  支持浅色 / 深色两套配色：首次跟随系统，右上角太阳 / 月亮按钮手动切换并记住选择；
+  WebUI token 登录页、QQ 扫码 / 密码登录页同步换肤并跟随系统深色；
+  修复移动端横向溢出与窄屏栅格错位。
+- WebUI「关于」页的能力说明更新为图片 / 语音 / 视频 / 文件都已支持。
+- 版本号统一到 0.3.0。
+
+### 文档
+
+- `docs/onebot-api.md` 新增「媒体发送」小节：四种来源、四类格式与大小上限；`video` / `file` 段标为支持。
+- `docs/qqnt-plugin.md` 媒体小节扩为四类，补充视频封面命名与排故。
+- README、文档站（introduction / troubleshooting / onebot）同步媒体能力与限制。
+- **文档站视觉重构**：自定义 VitePress 主题（首页 Hero / 能力卡片 / 三步接入 / 能力清单 / CTA），
+  马卡龙渐变配色 + 产品页排版；导航、侧边栏、代码块、表格、提示块、深浅主题全部重做，
+  新增 `public/logo.svg` 与主题组件。
+
+### 已知限制
+
+- 视频封面是内置占位图，没有从视频抽帧（需要 ffmpeg）；视频只支持 MP4 / MOV，其它容器请先转码。
+- `upload_group_file` 动作仍未实现，可用 `file` 段代替。
+- AMR、OGG 语音未做解码，会明确返回 `1401`。
+- 媒体上传依赖 QQ 的 `getRichMediaFilePathForGuild`；QQ 大版本改名后会退回临时目录并在日志告警。
+- 合并转发、群公告、表情回应、频道仍未实现。
+
 ## 0.2.0 - 2026-11-15
 
 ### 新增

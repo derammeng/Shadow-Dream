@@ -1,3 +1,4 @@
+import path from 'node:path';
 import {
   ActionError,
   MessageIdRegistry,
@@ -21,9 +22,21 @@ import {
   rawToMessageInfo,
   type ConvertContext,
   type GroupLike,
+  type MediaHooks,
   type MemberLike,
   type RawMessage,
 } from './convert.js';
+import {
+  cleanupFallbackMedia,
+  createVideoThumbnail,
+  detectImage,
+  detectVideo,
+  loadMediaBytes,
+  md5Hex,
+  mediaFallbackPath,
+  toSilk,
+  writeMediaFile,
+} from './media.js';
 
 interface QqntBackendOptions {
   session: any;
@@ -52,11 +65,15 @@ interface PendingSend {
  */
 export class QqntBackend implements Backend {
   readonly name = 'qqnt';
-  readonly version = '0.2.0';
+  readonly version = '0.3.0';
   readonly selfId: number;
   readonly capabilities: ReadonlySet<Capability> = new Set<Capability>([
     'text',
     'face',
+    'image',
+    'record',
+    'video',
+    'file',
     'at',
     'reply',
     'group_admin',
@@ -138,8 +155,13 @@ export class QqntBackend implements Backend {
   async start(): Promise<void> {
     if (this.started) return;
     this.started = true;
+    this.logger.debug('backend.start: 注册 listener');
     this.installListeners();
+    this.logger.debug('backend.start: 拉取群 / 好友列表');
     await this.bootstrap();
+    this.logger.debug('backend.start: bootstrap 完成');
+    // 临时目录里的媒体只是兜底，启动时清掉一天前的残留。
+    void cleanupFallbackMedia().catch(() => undefined);
   }
 
   async stop(): Promise<void> {
@@ -366,10 +388,22 @@ export class QqntBackend implements Backend {
     } as OneBotEvent);
   }
 
-  onGroupListUpdate(groups: GroupLike[] | { groupList?: GroupLike[] }): void {
+  /**
+   * QQ 的 `onGroupListUpdate(updateType, groupList)` 是两个参数：
+   * `updateType` 为 3（REMOVE）表示这些群被移除。老版本可能只传列表，
+   * 所以两种形状都要认。
+   */
+  onGroupListUpdate(
+    groups: GroupLike[] | { groupList?: GroupLike[] },
+    updateType = 0,
+  ): void {
     const list = Array.isArray(groups) ? groups : (groups?.groupList ?? []);
     for (const group of list) {
       if (!group?.groupCode) continue;
+      if (updateType === 3) {
+        this.groups.delete(Number(group.groupCode));
+        continue;
+      }
       this.groups.set(Number(group.groupCode), group);
       if (group.groupOwnerId?.memberUid) {
         this.uidToUin.set(
@@ -420,7 +454,16 @@ export class QqntBackend implements Backend {
     const groupService = this.groupService();
     if (groupService?.addKernelGroupListener) {
       const listener = {
-        onGroupListUpdate: (groups: GroupLike[]) => this.onGroupListUpdate(groups),
+        // 新版 QQ：onGroupListUpdate(updateType, groupList)。
+        onGroupListUpdate: (first: unknown, second?: unknown) => {
+          if (Array.isArray(second)) {
+            this.onGroupListUpdate(second as GroupLike[], Number(first) || 0);
+          } else if (Array.isArray(first)) {
+            this.onGroupListUpdate(first as GroupLike[]);
+          } else if (first && typeof first === 'object') {
+            this.onGroupListUpdate(first as { groupList?: GroupLike[] });
+          }
+        },
       };
       try {
         this.groupListenerId = groupService.addKernelGroupListener(listener);
@@ -460,17 +503,21 @@ export class QqntBackend implements Backend {
     const elements = await messageToElements(message, {
       ...this.context(),
       groupId: type === 'group' ? targetId : undefined,
+      media: this.mediaHooks(),
     });
     const service = this.msgService();
     if (!service?.sendMsg) throw ActionError.unsupported('当前 QQNT 版本没有 sendMsg');
 
     const uniqueId = this.makeUniqueId(peer.chatType);
     peer.guildId = uniqueId;
+    // 带媒体的消息要等 QQ 上传完才回传消息，超时时间给得宽一些。
+    const hasMedia = message.some(segment => segment.type === 'image' || segment.type === 'record');
+    const timeoutMs = hasMedia ? 60_000 : 15_000;
     const raw = await new Promise<RawMessage>((resolve, reject) => {
       const timer = setTimeout(() => {
         this.pendingSends.delete(uniqueId);
         reject(new Error('发送超时：QQ 没有回传消息 ID'));
-      }, 15_000);
+      }, timeoutMs);
       this.pendingSends.set(uniqueId, { resolve, reject, timer });
 
       Promise.resolve(service.sendMsg('0', peer, elements, new Map()))
@@ -498,6 +545,250 @@ export class QqntBackend implements Backend {
     if (type === 'private') event.target_id = targetId;
     this.emit(event);
     return { message_id: event.message_id };
+  }
+
+  /**
+   * 媒体段的上传钩子：把媒体写进 QQ 的富媒体缓存目录，并构造 QQ 认识的
+   * picElement / pttElement / videoElement / fileElement，由 QQ 在 sendMsg
+   * 时自己完成上传。
+   */
+  private mediaHooks(): MediaHooks {
+    return {
+      image: data => this.buildImageElement(data),
+      record: data => this.buildRecordElement(data),
+      video: data => this.buildVideoElement(data),
+      file: data => this.buildFileElement(data),
+    };
+  }
+
+  private async buildImageElement(data: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const loaded = await loadMediaBytes(mediaSourceOf(data), 'image');
+    const info = detectImage(loaded.bytes);
+    if (!info) {
+      throw ActionError.badRequest(`无法识别的图片格式：${loaded.fileName || loaded.source}`);
+    }
+    const md5 = md5Hex(loaded.bytes);
+    const fileName = withExtension(loaded.fileName, `${md5}${info.ext}`);
+    const subType = Number(data.sub_type ?? 0) === 1 ? 1 : 0;
+    const target = await this.cacheMediaFile({
+      md5,
+      fileName,
+      bytes: loaded.bytes,
+      elementType: 2,
+      elementSubType: subType,
+      fallbackExt: info.ext,
+    });
+    const summary = typeof data.summary === 'string' && data.summary ? data.summary : '[图片]';
+    return {
+      elementType: 2,
+      elementId: '',
+      picElement: {
+        md5HexStr: md5,
+        fileSize: String(loaded.bytes.length),
+        picWidth: info.width,
+        picHeight: info.height,
+        fileName,
+        sourcePath: target,
+        original: true,
+        picType: info.picType,
+        picSubType: subType,
+        fileUuid: '',
+        fileSubId: '',
+        thumbFileSize: 0,
+        summary,
+      },
+    };
+  }
+
+  private async buildRecordElement(data: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const loaded = await loadMediaBytes(mediaSourceOf(data), 'record');
+    const silk = await toSilk(loaded.bytes, loaded.fileName || loaded.source || 'voice');
+    const md5 = md5Hex(silk.silk);
+    const fileName = `${md5}.silk`;
+    const target = await this.cacheMediaFile({
+      md5,
+      fileName,
+      bytes: silk.silk,
+      elementType: 4,
+      elementSubType: 0,
+      fallbackExt: '.silk',
+    });
+    // QQ 的 pttElement.duration 单位是秒，最少 1 秒。
+    const duration = Math.max(1, Math.round(silk.durationMs / 1000));
+    return {
+      elementType: 4,
+      elementId: '',
+      pttElement: {
+        fileName,
+        filePath: target,
+        md5HexStr: md5,
+        fileSize: String(silk.silk.length),
+        duration,
+        formatType: 1,
+        voiceType: 1,
+        voiceChangeType: 0,
+        canConvert2Text: true,
+        waveAmplitudes: [0, 18, 9, 23, 16, 17, 16, 15, 44, 17, 24, 20, 14, 15, 17],
+        fileSubId: '',
+        playState: 1,
+        autoConvertText: 0,
+        storeID: 0,
+        otherBusinessInfo: { aiVoiceType: 0 },
+      },
+    };
+  }
+
+  private async buildVideoElement(data: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const loaded = await loadMediaBytes(mediaSourceOf(data), 'video');
+    const info = detectVideo(loaded.bytes, loaded.fileName || loaded.source || 'video.mp4');
+    const md5 = md5Hex(loaded.bytes);
+    const ext = info.format === 8 ? '.mov' : '.mp4';
+    const fileName = withExtension(loaded.fileName, `${md5}${ext}`);
+    const target = await this.cacheMediaFile({
+      md5,
+      fileName,
+      bytes: loaded.bytes,
+      elementType: 5,
+      elementSubType: 0,
+      fallbackExt: ext,
+    });
+    // 不引入 ffmpeg：用一张渐变占位图作为封面，避免 videoElement 缺 thumbPath。
+    const thumb = createVideoThumbnail();
+    const thumbMd5 = md5Hex(thumb);
+    // QQ 按视频 md5 找封面：文件名必须是 <videoMd5>_0.png。
+    const thumbPath = await this.cacheVideoThumbnail(target, `${md5}_0.png`, thumb);
+    this.logger.debug(
+      `视频 ${fileName}：${info.width}x${info.height} ${Math.round(info.durationSec)}s`
+      + `${info.parsed ? '' : '（容器信息未解析，使用默认值）'}`,
+    );
+    return {
+      elementType: 5,
+      elementId: '',
+      videoElement: {
+        fileName,
+        filePath: target,
+        videoMd5: md5,
+        thumbMd5,
+        fileTime: Math.max(1, Math.round(info.durationSec)),
+        fileFormat: info.format,
+        fileWidth: info.width,
+        fileHeight: info.height,
+        thumbPath: new Map([[0, thumbPath]]),
+        thumbSize: thumb.length,
+        thumbWidth: info.width,
+        thumbHeight: info.height,
+        fileSize: String(loaded.bytes.length),
+        fileUuid: '',
+        fileSubId: '',
+      },
+    };
+  }
+
+  private async buildFileElement(data: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const loaded = await loadMediaBytes(mediaSourceOf(data), 'file');
+    const md5 = md5Hex(loaded.bytes);
+    const rawName = typeof data.name === 'string' && data.name.trim()
+      ? data.name.trim()
+      : loaded.fileName;
+    const fileName = rawName || `${md5}.bin`;
+    const target = await this.cacheMediaFile({
+      md5,
+      fileName,
+      bytes: loaded.bytes,
+      elementType: 3,
+      elementSubType: 0,
+      fallbackExt: path.extname(fileName) || '.bin',
+    });
+    return {
+      elementType: 3,
+      elementId: '',
+      fileElement: {
+        fileName,
+        filePath: target,
+        fileSize: String(loaded.bytes.length),
+        fileMd5: md5,
+        folderId: '',
+      },
+    };
+  }
+
+  /** 视频封面放在缓存目录的 Thumb 子目录；拿不到缓存路径时就放临时目录旁边。 */
+  private async cacheVideoThumbnail(videoPath: string, fileName: string, bytes: Buffer): Promise<string> {
+    const dir = videoPath.replace(/[\\/]Ori[\\/]/, `${path.sep}Thumb${path.sep}`);
+    const target = path.join(path.dirname(dir), fileName);
+    try {
+      return await writeMediaFile(target, bytes);
+    } catch (error) {
+      this.logger.warn(`写入视频封面失败，改用临时目录：${(error as Error).message}`);
+      return writeMediaFile(
+        path.join(path.dirname(mediaFallbackPath('thumb', '.png')), fileName),
+        bytes,
+      );
+    }
+  }
+
+  private async cacheMediaFile(input: {
+    md5: string;
+    fileName: string;
+    bytes: Buffer;
+    elementType: number;
+    elementSubType: number;
+    fallbackExt: string;
+  }): Promise<string> {
+    const cached = this.richMediaCachePath(input);
+    if (cached) {
+      try {
+        return await writeMediaFile(cached, input.bytes);
+      } catch (error) {
+        this.logger.warn(`写入 QQ 媒体缓存失败，改用临时目录：${(error as Error).message}`);
+      }
+    }
+    const fallback = mediaFallbackPath(input.md5, input.fallbackExt);
+    return writeMediaFile(fallback, input.bytes);
+  }
+
+  /**
+   * QQ 不同版本暴露的缓存路径 API 不一样：3.2 同时有 ForGuild 和 MobileQQSend
+   * 两个变体。逐个尝试，拿不到就返回 null 走临时目录。
+   */
+  private richMediaCachePath(input: {
+    md5: string;
+    fileName: string;
+    elementType: number;
+    elementSubType: number;
+  }): string | null {
+    const service = this.msgService();
+    if (!service) return null;
+    const params = {
+      md5HexStr: input.md5,
+      fileName: input.fileName,
+      elementType: input.elementType,
+      elementSubType: input.elementSubType,
+      thumbSize: 0,
+      needCreate: true,
+      downloadType: 1,
+      file_uuid: '',
+    };
+    const candidates = [
+      ['getRichMediaFilePathForGuild', service.getRichMediaFilePathForGuild],
+      ['getRichMediaFilePathForMobileQQSend', service.getRichMediaFilePathForMobileQQSend],
+      ['getRichMediaFilePath', service.getRichMediaFilePath],
+    ] as const;
+    for (const [name, fn] of candidates) {
+      if (typeof fn !== 'function') continue;
+      try {
+        const result = fn.call(service, params);
+        const text = typeof result === 'string' ? result : '';
+        if (text && /[\\/]/.test(text)) {
+          this.logger.debug(`媒体缓存路径（${name}）：${text}`);
+          return text;
+        }
+      } catch (error) {
+        this.logger.debug(`${name} 不可用：${(error as Error).message}`);
+      }
+    }
+    this.logger.warn('QQNT 没有暴露富媒体缓存路径 API，媒体会使用临时目录路径');
+    return null;
   }
 
   private deleteMessage(params: BackendActionParams): null {
@@ -642,6 +933,25 @@ export class QqntBackend implements Backend {
     return group;
   }
 
+  /**
+   * 原生服务偶尔不 resolve（QQ 刚登录或状态异常时），超时后继续启动流程，
+   * 避免整个插件卡在 bootstrap 上。
+   */
+  private async withTimeout<T>(label: string, promise: Promise<T> | undefined, ms: number): Promise<T | undefined> {
+    if (!promise) return undefined;
+    let timer: NodeJS.Timeout | undefined;
+    const timeout = new Promise<undefined>((resolve) => {
+      timer = setTimeout(() => {
+        this.logger.debug(`${label} 超过 ${ms}ms 未返回，跳过`);
+        resolve(undefined);
+      }, ms);
+    });
+    try {
+      return await Promise.race([promise, timeout]);
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  }
   private async refreshGroups(timeoutMs = 3000): Promise<void> {
     if (this.groups.size > 0) return;
     const service = this.groupService();
@@ -652,7 +962,7 @@ export class QqntBackend implements Backend {
       timer = setTimeout(resolve, timeoutMs);
     });
     try {
-      const result = await service.getGroupList(true);
+      const result = await this.withTimeout('getGroupList', service.getGroupList(true), timeoutMs) as any;
       const inline = result?.groupList ?? result?.result?.groupList;
       if (Array.isArray(inline) && inline.length > 0) this.onGroupListUpdate(inline);
     } catch (error) {
@@ -679,7 +989,7 @@ export class QqntBackend implements Backend {
       timer = setTimeout(resolve, 5000);
     });
     try {
-      const result = await service.getAllMemberList(String(groupId), true);
+      const result = await this.withTimeout('getAllMemberList', service.getAllMemberList(String(groupId), true), 5000) as any;
       const infos = result?.result?.infos;
       const map = new Map<string, MemberLike>();
       if (infos instanceof Map) {
@@ -711,13 +1021,13 @@ export class QqntBackend implements Backend {
     let result: any;
     try {
       // 新版本是 (callFrom, isPullRefresh, reqType)，旧版本只有两参。
-      result = await service.getBuddyListV2('0', true, 0);
+      result = await this.withTimeout('getBuddyListV2', service.getBuddyListV2('0', true, 0), 5000);
     } catch {
-      result = await service.getBuddyListV2('0', 0);
+      result = await this.withTimeout('getBuddyListV2(legacy)', service.getBuddyListV2('0', 0), 5000);
     }
     const uids: string[] = (result?.data ?? []).flatMap((category: { buddyUids?: string[] }) => category.buddyUids ?? []);
     if (uids.length === 0) return;
-    const profiles = await this.profileService()?.getCoreAndBaseInfo?.('0', uids);
+    const profiles = await this.withTimeout('getCoreAndBaseInfo', this.profileService()?.getCoreAndBaseInfo?.('0', uids), 5000);
     if (!(profiles instanceof Map)) return;
     for (const [uid, profile] of profiles) {
       const info = friendToInfo(profile as Record<string, unknown>);
@@ -929,5 +1239,21 @@ function assertResult(result: { result?: number; errMsg?: string } | undefined, 
   if (result && typeof result.result === 'number' && result.result !== 0) {
     throw ActionError.internal(`${label}：${result.errMsg || `错误码 ${result.result}`}`);
   }
+}
+
+/** 媒体段的来源：优先 file，其次 url / path（不同 OneBot 后端的习惯）。 */
+function mediaSourceOf(data: Record<string, unknown>): string {
+  for (const key of ['file', 'url', 'path'] as const) {
+    const value = data[key];
+    if (typeof value === 'string' && value.trim()) return value;
+  }
+  throw ActionError.badRequest('媒体段缺少 file，也没有 url / path');
+}
+
+/** 保证有扩展名；QQ 的媒体缓存路径依赖扩展名区分格式。 */
+function withExtension(name: string, fallback: string): string {
+  const base = name && name.trim() ? name.trim() : fallback;
+  const ext = base.includes('.') ? base.slice(base.lastIndexOf('.')) : '';
+  return ext && ext.length <= 6 ? base : fallback;
 }
 

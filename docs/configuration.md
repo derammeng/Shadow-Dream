@@ -151,7 +151,7 @@ Shadow Dream 启动后主动连接 `reverseWs[].url`，推送事件；业务端�
 ```http
 X-Self-ID: 10001
 X-Signature: sha1=...
-User-Agent: Shadow Dream/0.2.0
+User-Agent: Shadow Dream/0.3.0
 ```
 
 签名：

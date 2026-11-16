@@ -172,9 +172,22 @@ HTTP 端口 3000 已被占用
 - 是否只监听了 `127.0.0.1`，却从另一台机器访问？
 - 设置了 token 时，WebUI 页面右上角要填同一个 token。
 
-### 发图片返回 1401
+### 发图片 / 语音 / 视频 / 文件
 
-0.1 的明确限制。图片发送需要 NTQQ 的 highway 上传通道；Shadow Dream 不会用「把本地路径塞进 element」的方式发一条坏消息。后续版本会补。
+0.3 起 QQNT 后端支持发送 `image`、`record`、`video`、`file` 四类媒体。实现方式都一样：把文件写进 QQ 自己的富媒体缓存目录（`getRichMediaFilePathForGuild` 返回的路径），再由 QQ 在 `sendMsg` 时完成上传——不碰 highway 协议，也不改 `wrapper.node`。
+
+- 图片来源：本地路径、`file://`、`http(s)://`、`base64://`；格式 PNG / JPEG / GIF / WebP / BMP。
+- 语音来源同上；格式 SILK / WAV / MP3，插件会把 WAV / MP3 解码后转成 SILK（24kHz 单声道）。
+- 视频支持 MP4 / MOV，插件会从容器里读时长与分辨率；封面用一张内置渐变占位图（缓存目录 `Thumb/<videoMd5>_0.png`）。QQ 按视频 md5 找封面，文件名必须是 `<videoMd5>_0.png`。
+- 文件支持任意类型，`name` 作为 QQ 里显示的文件名。
+
+排查要点：
+
+- 日志里应该有 `媒体缓存路径（getRichMediaFilePathForGuild）：...`；如果提示「QQNT 没有暴露富媒体缓存路径 API」，说明 QQ 版本变了，媒体会退到临时目录，发送可能失败。
+- `无法识别的语音格式`：把音频转成 silk / wav / mp3 再发；AMR、OGG 暂不支持。
+- `不支持的视频格式`：目前只做了 mp4 / mov，其它容器请先转码。
+- 视频发出去是黑屏 / 无封面：确认 `<videoMd5>_0.png` 写进了 `Video/<年月>/Thumb/`。
+- 发送后 60 秒内没有回传消息 ID 会超时（媒体上传比文本慢）。
 
 ### 收不到某类消息
 

@@ -119,7 +119,7 @@ export class ShadowDreamBot implements ActionExecutor, WebUiHost {
     this.backend = options.backend;
     this.logger = options.logger;
     this.appName = options.appName ?? 'shadowdream';
-    this.appVersion = options.appVersion ?? '0.2.0';
+    this.appVersion = options.appVersion ?? '0.3.0';
     this.configPath = options.configPath;
     this.watchConfig = options.watchConfig !== false;
     this.lastAppliedConfig = JSON.stringify(this.config);

@@ -1,6 +1,6 @@
 {
   "name": "@shadowdream/qqnt",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Shadow Dream 的 LiteLoaderQQNT 插件后端：把 QQNT 消息翻译成 OneBot 11",
   "private": true,
   "type": "commonjs",
@@ -8,11 +8,13 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && node scripts/build.mjs",
     "build:core-cjs": "tsc -p ../core/tsconfig.cjs.json",
-    "test": "node tests/convert.test.mjs && node tests/backend.test.mjs",
+    "test": "node tests/convert.test.mjs && node tests/media.test.mjs && node tests/backend.test.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@shadowdream/core": "^0.2.0",
+    "@shadowdream/core": "^0.3.0",
+    "mpg123-decoder": "^1.0.3",
+    "silk-wasm": "^3.7.1",
     "ws": "^8.18.0"
   }
 }

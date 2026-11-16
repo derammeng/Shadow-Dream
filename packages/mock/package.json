@@ -1,6 +1,6 @@
 {
   "name": "@shadowdream/mock",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Shadow Dream 内置的模拟 QQ 后端与演示 CLI",
   "type": "module",
   "main": "./dist/index.js",
@@ -16,6 +16,6 @@
     "test": "tsc -p tsconfig.test.json && node dist-test/tests/run.js"
   },
   "dependencies": {
-    "@shadowdream/core": "^0.2.0"
+    "@shadowdream/core": "^0.3.0"
   }
 }

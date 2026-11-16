@@ -2,7 +2,7 @@
 
 > 把 QQ 接进一场 OneBot 11 的影梦。
 >
-> 当前版本：**0.2.0**
+> 当前版本：**0.3.0**
 
 Shadow Dream 是一个新的 QQ → OneBot 11 运行时。它把「协议端」和「传输层」拆开：
 
@@ -10,7 +10,7 @@ Shadow Dream 是一个新的 QQ → OneBot 11 运行时。它把「协议端」�
 - **QQNT 插件**：作为 LiteLoaderQQNT 插件运行在 QQ 主进程里，复用 QQ 自己的登录态与 session，监听消息、调用发送接口。**不修改 `wrapper.node`，不注入 DLL，不接触密码 / 登录密钥。**
 - **模拟器**：内置一个会维护好友、群、成员、消息、撤回状态的假 QQ。没有 QQ 环境也能把整条 OneBot 链路跑起来、写测试、接 SDK。
 
-> 0.2 的状态：核心与模拟器已通过自动化测试和真实 HTTP / WebSocket 联调；QQNT 插件按 LiteLoader 生命周期实现，属于**实验性**后端。媒体发送（图片 / 语音 / 视频 / 文件）需要 NTQQ 的 highway 上传通道，0.2 暂未实现，会明确返回 1401，而不是发坏消息。
+> 0.3 的状态：核心与模拟器已通过自动化测试和真实 HTTP / WebSocket 联调；QQNT 插件按 LiteLoader 生命周期实现，属于**实验性**后端。媒体发送已补齐图片、语音、视频、文件：图片支持 PNG / JPEG / GIF / WebP / BMP，语音支持 SILK / WAV / MP3（自动转 SILK），视频支持 MP4 / MOV，文件不限类型；来源支持本地路径、`file://`、`http(s)://` 和 `base64://`。
 >
 > 版本变更见 [CHANGELOG.md](CHANGELOG.md)。
 
@@ -28,7 +28,7 @@ Shadow Dream 换了一个切面：
 | 协议实现 | 自己接管 packet / 登录 / 加密 | 复用 QQ 已经登录好的 wrapper 与 session |
 | 版本敏感点 | native DLL、offset、wrapper 补丁 | QQ wrapper 的 JS API 形状 |
 | 出问题时的定位 | native 崩溃、注入失败 | 插件日志 / Node 异常，通常可读 |
-| 核心能力 | 完整 | 0.2 覆盖文本、表情、@、回复、群管理；媒体待补 |
+| 核心能力 | 完整 | 0.3 覆盖文本、表情、@、回复、图片、语音、视频、文件、群管理 |
 
 它不是 NapCat 的 fork，也没有复制 NapCat 的代码。参考文件夹里的 NapCatQQ / SnowLuma 只用于理解 NTQQ wrapper 的公开 API 形状和 OneBot 行为；Shadow Dream 的传输层、消息模型、模拟器、插件生命周期都是重新实现的。
 
@@ -426,8 +426,9 @@ shadowdream/
 
 ## 已知限制
 
-- **QQNT 插件是 0.2 实验性后端**：不同 QQ / LiteLoader 版本的 wrapper 字段可能变化；欢迎带日志反馈。
-- **媒体发送未实现**：图片、语音、视频、文件发送需要 highway 上传，0.2 会返回 1401。接收侧会把图片 / 语音 / 视频 / 文件转换成对应的 OneBot 段（本地路径 / URL 视 QQ 缓存而定）。
+- **QQNT 插件是 0.3 实验性后端**：不同 QQ / LiteLoader 版本的 wrapper 字段可能变化；欢迎带日志反馈。
+- **媒体发送覆盖图片 / 语音 / 视频 / 文件**：来源支持本地路径 / `file://` / `http(s)://` / `base64://`；语音支持 SILK / WAV / MP3（自动转 SILK），视频支持 MP4 / MOV（封面用内置占位图），文件不限类型。接收侧会把图片 / 语音 / 视频 / 文件转换成对应的 OneBot 段（本地路径 / URL 视 QQ 缓存而定）。
+- **媒体上传依赖 QQ 自己的缓存路径 API**（`getRichMediaFilePathForGuild`）：QQ 大版本更新后如果该 API 改名，日志会提示并退回临时目录，需要跟进适配。
 - **扫码登录**：未登录时 WebUI 会通过 QQ 自己的登录服务显示二维码；登录过 QQ 后，token 通过会优先自动恢复账号，只有账号下线或恢复失败才显示二维码。
 - **群公告、合并转发、表情回应、频道 /  guild 等**尚未实现。
 - **平台**：Windows + Node 24 和 Linux 无头运行均已实测；macOS 理论可用，但未实测。
@@ -438,9 +439,9 @@ shadowdream/
 ## Roadmap
 
 - **0.2（已完成）**：一键启动、WebUI 更新页 / CLI 更新、自动恢复 QQ 登录、可选自动安装 QQ / LiteLoader / Xvfb、精简安装包、局域网地址显示、get_msg 1404 修复；
-- **0.3**：QQNT 媒体发送（highway 上传）、图片 / 语音 / 视频 / 文件；
-- **0.3**：灰条事件（群成员变动、拍一拍、撤回操作者）、合并转发；
-- **0.4**：多账号 / 多后端路由、OneBot 12 适配层；
+- **0.3（已完成）**：QQNT 图片 / 语音 / 视频 / 文件发送（本地路径 / URL / base64、SILK / WAV / MP3 转码、MP4 / MOV + 内置封面）、WebUI 与文档站改版；
+- **0.4**：灰条事件（群成员变动、拍一拍、撤回操作者）、合并转发、`upload_group_file`；
+- **0.5**：多账号 / 多后端路由、OneBot 12 适配层；
 - 长期：更完整的账号生命周期管理、插件自动更新。
 
 ---

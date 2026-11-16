@@ -155,14 +155,31 @@ QQNT 0.1 未实现。
 | `json` | `data` | ✅ | 作为 ark 发送 |
 | `xml` | `data` | ✅ | 作为 ark 发送 |
 | `mface` | `id`, `name` | ✅ | 商城表情 |
-| `image` | `file`, `url?` | ❌ 1401 | 需要 highway 上传 |
-| `record` | `file` | ❌ 1401 | 需要 highway 上传 |
-| `video` | `file` | ❌ 1401 | 需要 highway 上传 |
-| `file` | `file`, `name` | ❌ 1401 | 需要 highway 上传 |
+| `image` | `file`, `sub_type?`, `summary?` | ✅ | 图片，见下方「媒体发送」 |
+| `record` | `file` | ✅ | 语音，自动转 SILK，见下方「媒体发送」 |
+| `video` | `file` | ✅ | 视频，支持 mp4 / mov，见下方「媒体发送」 |
+| `file` | `file`, `name` | ✅ | 文件，见下方「媒体发送」 |
 | `poke` | `id` | ❌ 1401 | |
 | `forward` | `id` | ❌ 1401 | |
 
 接收侧会把 QQNT 的图片 / 语音 / 视频 / 文件元素转换为对应的 OneBot 段，`file` 尽量使用 QQ 缓存路径或文件 ID。
+
+### 媒体发送
+
+`image` / `record` / `video` / `file` 的 `file` 支持四种写法，Koishi / AstrBot 等后端常用的形式都能直接用：
+
+| 写法 | 示例 |
+|---|---|
+| 本地路径 | `/home/meng/pic.png`、`C:\\Users\\me\\pic.png` |
+| `file://` URL | `file:///home/meng/pic.png` |
+| `http(s)://` URL | `https://example.com/pic.png`（20 秒超时；图片 30MB / 语音 20MB / 视频与文件 100MB 上限） |
+| `base64://` | `base64://iVBORw0KGgo...` |
+
+- 图片格式：PNG / JPEG / GIF / WebP / BMP；`sub_type: 1` 表示表情包。
+- 语音格式：SILK（直传）、WAV、MP3。其它格式（AMR / OGG）会明确返回 `1401`，不会发一条坏语音。
+- 语音会被重采样到 24kHz 并转成 QQ 需要的 SILK，时长按秒写进 `record.duration`。
+- 视频格式：MP4 / MOV；会尽量从容器里读出时长与分辨率，读不到时用保守默认值；封面暂时用内置占位图。
+- 文件：任意类型，`name` 会作为 QQ 里显示的文件名，留空则用原文件名。
 
 ## 事件
 

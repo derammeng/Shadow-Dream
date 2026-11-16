@@ -3,286 +3,498 @@
  */
 export const WEBUI_CSS = `
 :root {
-  color-scheme: dark;
-  --bg: #070a12;
-  --panel: rgba(17, 23, 38, 0.86);
-  --panel-2: rgba(11, 16, 28, 0.78);
-  --line: rgba(148, 163, 184, 0.14);
-  --line-strong: rgba(148, 163, 184, 0.26);
-  --text: #e5e7eb;
-  --muted: #8b93a7;
-  --accent: #7dd3fc;
-  --accent-2: #a78bfa;
-  --good: #34d399;
-  --warn: #fbbf24;
-  --bad: #f87171;
+  color-scheme: light;
+  --bg: #fdfbff;
+  --surface: #ffffff;
+  --surface-2: #fbf8ff;
+  --panel-grad: linear-gradient(170deg, #ffffff, #fdfaff);
+  --side-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(251, 248, 255, 0.82));
+  --bar-bg: rgba(255, 255, 255, 0.86);
+  --input-bg: #ffffff;
+  --line: #efe9fa;
+  --line-strong: #e2d8f5;
+  --text: #211a33;
+  --text-2: #4c4466;
+  --muted: #7b7394;
+  --accent: #6a4bf5;
+  --accent-2: #b06bff;
+  --accent-3: #ff7ab6;
+  --accent-soft: rgba(122, 92, 255, 0.1);
+  --gradient: linear-gradient(118deg, #7a5cff 0%, #b06bff 42%, #ff7ab6 100%);
+  --gradient-soft: linear-gradient(118deg, rgba(122, 92, 255, 0.12), rgba(255, 122, 182, 0.12));
+  --good: #1f9c78;
+  --warn: #c9821a;
+  --bad: #d8446f;
+  --shadow-xs: 0 1px 2px rgba(33, 26, 51, 0.04);
+  --shadow-sm: 0 6px 18px rgba(33, 26, 51, 0.06);
+  --shadow-md: 0 18px 44px rgba(60, 40, 120, 0.1);
+  --shadow-lg: 0 32px 80px rgba(60, 40, 120, 0.16);
+  --glow-a: rgba(255, 122, 182, 0.12);
+  --glow-b: rgba(122, 92, 255, 0.12);
+  --hero-grad:
+    radial-gradient(360px 160px at 0% 0%, rgba(255, 122, 182, 0.16), transparent 70%),
+    radial-gradient(320px 150px at 100% 100%, rgba(107, 184, 255, 0.14), transparent 72%),
+    linear-gradient(150deg, #ffffff, #fbf7ff);
+  --ws-grad: linear-gradient(170deg, #ffffff, #fbf7ff);
+  --result-bg: #f7f3ff;
+  --switch-off: #e4dcf3;
+  --overlay: rgba(33, 26, 51, 0.42);
+  --banner-bg: rgba(255, 214, 178, 0.28);
+  --banner-border: rgba(201, 130, 26, 0.3);
+  --banner-text: #8a5510;
+  --toast-bg: #211a33;
+  --toast-text: #f6f1ff;
+  --log-bg: #171130;
+  --log-text: #d8d0ee;
+  --log-time: #7c7396;
+  --log-scope: #9a8fbe;
+  --log-msg: #ddd5f2;
+  --log-info: #a6f0d3;
+  --log-debug: #8fd8f6;
+  --log-warn: #f0b45f;
+  --log-error: #ff8aa9;
   --mono: "JetBrains Mono", "Cascadia Code", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --display: "Inter", "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+
+html.dark {
+  color-scheme: dark;
+  --bg: #0d0a17;
+  --surface: #171128;
+  --surface-2: #120d20;
+  --panel-grad: linear-gradient(170deg, #191228, #140f22);
+  --side-bg: linear-gradient(180deg, rgba(23, 17, 40, 0.94), rgba(18, 13, 32, 0.86));
+  --bar-bg: rgba(23, 17, 40, 0.86);
+  --input-bg: #140f22;
+  --line: #2a2242;
+  --line-strong: #372d55;
+  --text: #f6f1ff;
+  --text-2: #cfc6e6;
+  --muted: #948cab;
+  --accent: #b9a3ff;
+  --accent-2: #c58bff;
+  --accent-3: #ff92c4;
+  --accent-soft: rgba(154, 123, 255, 0.16);
+  --gradient: linear-gradient(118deg, #9a7bff 0%, #c58bff 42%, #ff92c4 100%);
+  --gradient-soft: linear-gradient(118deg, rgba(154, 123, 255, 0.2), rgba(255, 146, 196, 0.16));
+  --good: #5ee0b4;
+  --warn: #f0b45f;
+  --bad: #ff8aa9;
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 6px 18px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 18px 44px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 32px 80px rgba(0, 0, 0, 0.6);
+  --glow-a: rgba(255, 122, 182, 0.14);
+  --glow-b: rgba(122, 92, 255, 0.18);
+  --hero-grad:
+    radial-gradient(360px 160px at 0% 0%, rgba(255, 122, 182, 0.16), transparent 70%),
+    radial-gradient(320px 150px at 100% 100%, rgba(107, 184, 255, 0.12), transparent 72%),
+    linear-gradient(150deg, #1a132c, #151026);
+  --ws-grad: linear-gradient(170deg, #191228, #140f22);
+  --result-bg: #140f22;
+  --switch-off: #372d55;
+  --overlay: rgba(4, 2, 10, 0.62);
+  --banner-bg: rgba(201, 130, 26, 0.16);
+  --banner-border: rgba(240, 180, 95, 0.32);
+  --banner-text: #f0b45f;
+  --toast-bg: #f6f1ff;
+  --toast-text: #171128;
+  --log-bg: #100b1e;
+  --log-text: #ddd5f2;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; min-height: 100%; }
 body {
   background:
-    radial-gradient(1000px 600px at 0% -10%, rgba(124, 58, 237, 0.22), transparent 60%),
-    radial-gradient(900px 500px at 100% 0%, rgba(14, 165, 233, 0.14), transparent 55%),
+    radial-gradient(1000px 560px at 92% -8%, var(--glow-a), transparent 62%),
+    radial-gradient(820px 520px at 4% 0%, var(--glow-b), transparent 60%),
     var(--bg);
+  background-attachment: fixed;
   color: var(--text);
-  font-family: "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: var(--display);
   font-size: 14px;
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 button, input, select, textarea { font: inherit; }
+::selection { background: rgba(255, 122, 182, 0.24); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 99px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-track { background: transparent; }
+:focus-visible { outline: 2px solid rgba(122, 92, 255, 0.55); outline-offset: 2px; border-radius: 8px; }
 .hidden { display: none !important; }
-.app { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100vh; }
+
+/* ============ 布局 ============ */
+.app { display: grid; grid-template-columns: 252px minmax(0, 1fr); min-height: 100vh; }
 .sidebar {
   position: sticky; top: 0; height: 100vh; padding: 22px 16px 18px;
   border-right: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(7, 10, 18, 0.92), rgba(7, 10, 18, 0.74));
+  background: var(--side-bg);
+  backdrop-filter: blur(14px);
   display: flex; flex-direction: column; gap: 22px;
 }
+
+/* ============ 品牌 ============ */
 .brand { display: flex; gap: 12px; align-items: center; padding: 0 6px; }
 .logo {
-  width: 40px; height: 40px; border-radius: 12px; position: relative; flex: none;
-  background: linear-gradient(140deg, #a78bfa, #38bdf8 55%, #22d3ee);
-  box-shadow: 0 8px 30px rgba(56, 189, 248, 0.22);
+  width: 40px; height: 40px; border-radius: 13px; position: relative; flex: none;
+  background: var(--gradient);
+  box-shadow: 0 10px 24px rgba(122, 92, 255, 0.3);
 }
 .logo::after {
-  content: ""; position: absolute; inset: 10px; border-radius: 7px;
-  background: #0b1020; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+  content: ""; position: absolute; inset: 9px; border-radius: 50%;
+  background: #fff; opacity: 0.96;
+  -webkit-mask: radial-gradient(circle at 64% 36%, transparent 40%, #000 43%);
+  mask: radial-gradient(circle at 64% 36%, transparent 40%, #000 43%);
 }
-.brand h1 { font-size: 12px; letter-spacing: 0.11em; margin: 0; font-weight: 750; line-height: 1.35; }
+.brand h1 { font-size: 12.5px; letter-spacing: 0.1em; margin: 0; font-weight: 800; line-height: 1.35; color: var(--text); }
 .brand p { margin: 2px 0 0; color: var(--muted); font-size: 11px; }
+
+/* ============ 导航 ============ */
 .nav { display: flex; flex-direction: column; gap: 4px; }
 .nav-item {
-  border: 1px solid transparent; background: transparent; color: var(--muted);
-  text-align: left; padding: 9px 12px; border-radius: 9px; cursor: pointer;
-  display: flex; align-items: center; gap: 10px; font-size: 13px;
+  border: 1px solid transparent; background: transparent; color: var(--text-2);
+  text-align: left; padding: 9px 12px; border-radius: 11px; cursor: pointer;
+  display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600;
+  transition: color 0.16s ease, background-color 0.16s ease, border-color 0.16s ease;
 }
 .nav-item::before {
-  content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: 0.45;
+  content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.35;
+  transition: opacity 0.16s ease, box-shadow 0.16s ease;
 }
-.nav-item:hover { color: var(--text); background: rgba(148, 163, 184, 0.06); }
+.nav-item:hover { color: var(--text); background: var(--accent-soft); }
 .nav-item.active {
-  color: var(--accent); background: rgba(56, 189, 248, 0.09);
-  border-color: rgba(56, 189, 248, 0.18);
+  color: var(--accent); background: var(--gradient-soft);
+  border-color: rgba(122, 92, 255, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
-.nav-item.active::before { background: var(--accent); opacity: 1; box-shadow: 0 0 0 4px rgba(125, 211, 252, 0.1); }
+.nav-item.active::before { opacity: 1; background: var(--gradient); box-shadow: 0 0 0 4px rgba(122, 92, 255, 0.12); }
+
 .side-foot {
   margin-top: auto; border-top: 1px solid var(--line); padding: 14px 8px 0;
   display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 12px;
 }
-.side-foot strong { display: block; color: var(--text); font-size: 12px; font-weight: 600; }
+.side-foot strong { display: block; color: var(--text); font-size: 12px; font-weight: 700; }
 .side-foot small { display: block; font-size: 10px; color: var(--muted); }
+
+/* ============ 状态点 ============ */
 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex: none; }
-.dot.online { background: var(--good); box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.12); }
-.dot.offline { background: var(--bad); box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.12); }
-.dot.pending { background: var(--warn); box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.12); }
-.main { min-width: 0; padding: 24px 28px 56px; }
+.dot.online { background: var(--good); box-shadow: 0 0 0 4px rgba(31, 156, 120, 0.14); }
+.dot.offline { background: var(--bad); box-shadow: 0 0 0 4px rgba(216, 68, 111, 0.14); }
+.dot.pending { background: var(--warn); box-shadow: 0 0 0 4px rgba(201, 130, 26, 0.16); }
+
+/* ============ 主区域 ============ */
+.main { min-width: 0; overflow-x: clip; padding: 26px 30px 56px; }
 .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
-.topbar h2 { margin: 0; font-size: 20px; font-weight: 650; }
-.topbar p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+.topbar h2 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.02em; color: var(--text); }
+.topbar p { margin: 4px 0 0; color: var(--muted); font-size: 12.5px; }
 .top-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.pill {
-  display: inline-flex; align-items: center; gap: 8px; padding: 6px 11px;
-  border: 1px solid var(--line); border-radius: 999px; background: rgba(15, 23, 42, 0.6);
-  color: var(--muted); font-size: 12px;
-}
+
+/* ============ 按钮 ============ */
 .btn {
-  border: 1px solid rgba(125, 211, 252, 0.32);
-  background: linear-gradient(180deg, rgba(56, 189, 248, 0.18), rgba(56, 189, 248, 0.07));
-  color: #bae6fd; padding: 8px 14px; border-radius: 9px; cursor: pointer; font-size: 12px;
+  border: 1px solid transparent;
+  background: var(--gradient);
+  color: #fff; padding: 8px 16px; border-radius: 999px; cursor: pointer;
+  font-size: 12.5px; font-weight: 700; letter-spacing: 0.01em;
+  box-shadow: 0 10px 22px -10px rgba(122, 92, 255, 0.65);
+  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease,
+    background-color 0.16s ease, color 0.16s ease;
 }
-.btn:hover { border-color: rgba(125, 211, 252, 0.58); }
-.btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn.ghost { background: transparent; color: var(--muted); border-color: var(--line); }
-.btn.ghost:hover { color: var(--text); border-color: var(--line-strong); }
-.btn.danger { color: #fecaca; border-color: rgba(248, 113, 113, 0.35); background: rgba(248, 113, 113, 0.08); }
-.btn.sm { padding: 6px 10px; font-size: 11px; }
+.btn:hover { transform: translateY(-1px); box-shadow: 0 14px 26px -10px rgba(122, 92, 255, 0.7); }
+.btn:active { transform: translateY(0); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn.ghost { background: var(--surface); color: var(--text-2); border-color: var(--line-strong); box-shadow: var(--shadow-xs); }
+.btn.ghost:hover { color: var(--accent); border-color: rgba(122, 92, 255, 0.4); box-shadow: var(--shadow-sm); }
+.btn.danger { background: rgba(216, 68, 111, 0.1); color: var(--bad); border-color: rgba(216, 68, 111, 0.28); box-shadow: none; }
+.btn.danger:hover { background: rgba(216, 68, 111, 0.16); border-color: rgba(216, 68, 111, 0.45); }
+.btn.sm { padding: 6px 12px; font-size: 11.5px; }
+.btn.theme-btn { padding: 6px 9px; display: inline-flex; align-items: center; justify-content: center; }
+.btn.theme-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.btn.theme-btn .icon-sun { display: none; }
+html.dark .btn.theme-btn .icon-sun { display: block; }
+html.dark .btn.theme-btn .icon-moon { display: none; }
+
+/* ============ 卡片 ============ */
 .view { display: none; }
-.view.active { display: block; animation: fade 0.16s ease; }
+.view.active { display: block; animation: fade 0.18s ease; }
 @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 .card {
-  background: linear-gradient(180deg, rgba(24, 31, 50, 0.9), rgba(13, 18, 32, 0.82));
-  border: 1px solid var(--line); border-radius: 15px; padding: 16px 18px;
-  box-shadow: 0 18px 50px rgba(2, 6, 23, 0.2);
+  background: var(--panel-grad);
+  border: 1px solid var(--line); border-radius: 20px; padding: 18px 20px;
+  box-shadow: var(--shadow-xs);
 }
 .card + .card { margin-top: 14px; }
-.card h3 { font-size: 13px; margin: 0 0 3px; font-weight: 650; letter-spacing: 0.02em; }
-.card .hint { color: var(--muted); font-size: 12px; margin: 0 0 14px; }
+.card h3 { font-size: 14px; margin: 0 0 4px; font-weight: 750; letter-spacing: -0.01em; color: var(--text); }
+.card .hint { color: var(--muted); font-size: 12.5px; margin: 0 0 14px; }
+.card .hint code { font-family: var(--mono); font-size: 11.5px; background: var(--accent-soft); color: var(--accent); border-radius: 6px; padding: 1px 6px; }
+
 .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; margin: 14px 0; }
 .stats > .card + .card { margin-top: 0; }
-.stat-label { color: var(--muted); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; }
-.stat-value { font-size: 24px; font-weight: 650; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.stat-label { color: var(--muted); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; }
+.stat-value { font-size: 26px; font-weight: 800; margin-top: 3px; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; color: var(--text); }
 .stat-sub { color: var(--muted); font-size: 11px; margin-top: 1px; }
+
+/* ============ 账号 Hero ============ */
 .hero {
   display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
-  background:
-    radial-gradient(300px 130px at 0% 0%, rgba(167, 139, 250, 0.2), transparent 70%),
-    linear-gradient(180deg, rgba(24, 31, 50, 0.95), rgba(13, 18, 32, 0.9));
+  border-color: rgba(122, 92, 255, 0.18);
+  background: var(--hero-grad);
+  box-shadow: var(--shadow-sm);
 }
 .avatar {
   width: 58px; height: 58px; border-radius: 18px; flex: none;
-  display: grid; place-items: center; font-size: 21px; font-weight: 750;
-  background: linear-gradient(140deg, rgba(167, 139, 250, 0.85), rgba(56, 189, 248, 0.8));
-  color: #07101f; box-shadow: 0 10px 34px rgba(56, 189, 248, 0.18);
+  display: grid; place-items: center; font-size: 22px; font-weight: 800;
+  background: var(--gradient);
+  color: #fff; box-shadow: 0 12px 26px -10px rgba(122, 92, 255, 0.7);
 }
-.hero-name { font-size: 20px; font-weight: 650; line-height: 1.3; }
-.hero-sub { color: var(--muted); font-size: 12px; }
+.hero-name { font-size: 22px; font-weight: 800; line-height: 1.3; letter-spacing: -0.02em; }
+.hero-sub { color: var(--muted); font-size: 12.5px; }
 .hero-spacer { flex: 1; }
+
+/* ============ 两栏 ============ */
 .grid-two { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: 14px; margin-top: 14px; align-items: start; }
 .grid-two > .card + .card { margin-top: 0; }
-.endpoint { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px dashed rgba(148,163,184,0.11); }
+
+/* ============ 端点 / 元信息 ============ */
+.endpoint { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px dashed var(--line-strong); min-width: 0; }
 .endpoint:last-child { border-bottom: none; }
-.endpoint .name { width: 86px; color: var(--muted); font-size: 11px; flex: none; }
-.endpoint code { font-family: var(--mono); font-size: 12px; color: var(--accent); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.endpoint .copy { margin-left: auto; border: 1px solid var(--line); background: rgba(15,23,42,0.6); color: var(--muted); border-radius: 7px; padding: 2px 8px; cursor: pointer; font-size: 10px; }
-.endpoint .copy:hover { color: var(--text); border-color: rgba(125,211,252,0.35); }
-.meta-line { display: flex; justify-content: space-between; gap: 14px; padding: 8px 0; border-bottom: 1px dashed rgba(148,163,184,0.11); font-size: 12px; }
+.endpoint .name { width: 86px; color: var(--muted); font-size: 11.5px; flex: none; }
+.endpoint code { flex: 1; min-width: 0; font-family: var(--mono); font-size: 12px; color: var(--accent); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.endpoint .copy {
+  margin-left: auto; border: 1px solid var(--line-strong); background: var(--surface); color: var(--muted);
+  border-radius: 999px; padding: 3px 10px; cursor: pointer; font-size: 10.5px; font-weight: 600;
+  transition: color 0.16s ease, border-color 0.16s ease;
+}
+.endpoint .copy:hover { color: var(--accent); border-color: rgba(122, 92, 255, 0.4); }
+.meta-line { display: flex; justify-content: space-between; gap: 14px; padding: 8px 0; border-bottom: 1px dashed var(--line-strong); font-size: 12.5px; }
 .meta-line:last-child { border-bottom: none; }
-.meta-line span:first-child { color: var(--muted); }
-.meta-line span:last-child { text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.meta-line span:first-child { color: var(--muted); white-space: nowrap; }
+.meta-line span:last-child { min-width: 0; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-2); }
+
+/* ============ 事件列表 ============ */
 .event-list { display: flex; flex-direction: column; }
-.event-row { display: flex; align-items: center; gap: 12px; padding: 7px 0; border-bottom: 1px dashed rgba(148,163,184,0.11); font-size: 12px; }
+.event-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px dashed var(--line-strong); font-size: 12px; }
 .event-row:last-child { border-bottom: none; }
-.event-time { color: #566079; font-family: var(--mono); font-size: 11px; width: 64px; flex: none; }
-.event-type { color: var(--accent-2); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; width: 74px; flex: none; }
-.event-text { color: #cbd5e1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.event-time { color: var(--muted); font-family: var(--mono); font-size: 11px; width: 64px; flex: none; }
+.event-type { color: var(--accent-2); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; width: 74px; flex: none; font-weight: 700; }
+.event-text { color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .event-empty { color: var(--muted); font-size: 12px; padding: 6px 0; }
+
+/* ============ 徽标 ============ */
+.pill {
+  display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px;
+  border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface);
+  color: var(--text-2); font-size: 12px; font-weight: 600; box-shadow: var(--shadow-xs);
+}
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-.chip { font-size: 10px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
-.badge-ok { color: var(--good); border-color: rgba(52,211,153,0.3); background: rgba(52,211,153,0.08); }
-.badge-bad { color: var(--bad); border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.08); }
-.badge-warn { color: var(--warn); border-color: rgba(251,191,36,0.3); background: rgba(251,191,36,0.08); }
+.chip { font-size: 10.5px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line-strong); color: var(--muted); background: var(--surface); font-weight: 600; }
+.badge-ok { color: var(--good); border-color: rgba(31, 156, 120, 0.3); background: rgba(31, 156, 120, 0.1); }
+.badge-bad { color: var(--bad); border-color: rgba(216, 68, 111, 0.3); background: rgba(216, 68, 111, 0.1); }
+.badge-warn { color: var(--warn); border-color: rgba(201, 130, 26, 0.32); background: rgba(201, 130, 26, 0.12); }
+
+/* ============ 表单 ============ */
 .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 14px; }
 .form-grid .full { grid-column: 1 / -1; }
 .field { display: block; min-width: 0; }
-.field > span { display: block; color: var(--muted); font-size: 11px; margin-bottom: 5px; }
+.field > span { display: block; color: var(--muted); font-size: 11.5px; margin-bottom: 5px; font-weight: 600; }
 .field input[type="text"], .field input[type="number"], .field select, .field textarea {
-  width: 100%; border: 1px solid var(--line); background: rgba(8, 12, 22, 0.78);
-  color: var(--text); border-radius: 8px; padding: 8px 10px; font-family: var(--mono); font-size: 12px;
+  width: 100%; border: 1px solid var(--line-strong); background: var(--input-bg);
+  color: var(--text); border-radius: 11px; padding: 9px 11px; font-family: var(--mono); font-size: 12px;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
 }
 .field textarea { min-height: 96px; resize: vertical; line-height: 1.55; }
-.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: rgba(125,211,252,0.45); }
-.check { display: flex; align-items: center; gap: 8px; padding-top: 20px; color: var(--muted); font-size: 12px; }
-.check input { accent-color: #38bdf8; }
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none; border-color: rgba(122, 92, 255, 0.5); box-shadow: 0 0 0 4px rgba(122, 92, 255, 0.1);
+}
+.check { display: flex; align-items: center; gap: 8px; padding-top: 20px; color: var(--text-2); font-size: 12px; }
+.check input { accent-color: var(--accent); width: 15px; height: 15px; }
 .section-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
+/* ============ 编辑器行 ============ */
 .editor-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
 .editor-row { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 34px; gap: 8px; align-items: center; }
 .editor-row.reverse { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 90px 34px; }
 .editor-row input {
-  width: 100%; border: 1px solid var(--line); background: rgba(8, 12, 22, 0.78);
-  color: var(--text); border-radius: 8px; padding: 7px 9px; font-family: var(--mono); font-size: 11px;
+  width: 100%; border: 1px solid var(--line-strong); background: var(--input-bg);
+  color: var(--text); border-radius: 10px; padding: 8px 10px; font-family: var(--mono); font-size: 11px;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
 }
+.editor-row input:focus { outline: none; border-color: rgba(122, 92, 255, 0.5); box-shadow: 0 0 0 4px rgba(122, 92, 255, 0.1); }
 .editor-row .del {
-  border: 1px solid var(--line); background: transparent; color: var(--muted);
-  border-radius: 7px; height: 30px; cursor: pointer; font-size: 15px;
+  border: 1px solid var(--line-strong); background: var(--surface); color: var(--muted);
+  border-radius: 10px; height: 32px; cursor: pointer; font-size: 15px;
+  transition: color 0.16s ease, border-color 0.16s ease;
 }
-.editor-row .del:hover { color: var(--bad); border-color: rgba(248,113,113,0.35); }
+.editor-row .del:hover { color: var(--bad); border-color: rgba(216, 68, 111, 0.4); }
+.editor-labels {
+  display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 34px;
+  gap: 8px; margin: 12px 0 2px; font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+}
+.editor-labels span { padding-left: 2px; }
+.editor-row input.invalid { border-color: rgba(216, 68, 111, 0.6); box-shadow: 0 0 0 4px rgba(216, 68, 111, 0.1); }
+.actions-bar .status.dirty { color: var(--warn); font-weight: 700; }
+/* 操作条是 sticky 的，给表单底部留出空间，避免盖住「添加」按钮。 */
+#view-network { padding-bottom: 88px; }
+
+/* ============ 底部操作条 ============ */
 .actions-bar {
-  position: sticky; bottom: 0; z-index: 5; margin-top: 14px; padding: 12px 14px;
-  border: 1px solid var(--line); border-radius: 12px;
-  background: rgba(8, 12, 22, 0.9); backdrop-filter: blur(12px);
+  position: sticky; bottom: 12px; z-index: 5; margin-top: 18px; padding: 12px 14px;
+  border: 1px solid var(--line-strong); border-radius: 16px;
+  background: var(--surface); backdrop-filter: blur(14px);
+  box-shadow: var(--shadow-md);
   display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
 }
-.actions-bar .status { color: var(--muted); font-size: 11px; margin-left: auto; }
-.banner { padding: 10px 13px; border-radius: 9px; border: 1px solid rgba(251,191,36,0.3); background: rgba(251,191,36,0.08); color: #fde68a; font-size: 12px; margin-bottom: 14px; }
-.banner a { color: #fef3c7; text-decoration: underline; }
-pre.result {
-  margin: 10px 0 0; padding: 11px; border-radius: 9px; background: rgba(2,6,23,0.65);
-  border: 1px solid var(--line); font-family: var(--mono); font-size: 11px; max-height: 220px; overflow: auto;
-  white-space: pre-wrap; word-break: break-word; color: #cbd5e1;
+.actions-bar .status { color: var(--muted); font-size: 11.5px; margin-left: auto; }
+
+/* ============ 提示条 ============ */
+.banner {
+  padding: 11px 14px; border-radius: 14px; border: 1px solid var(--banner-border);
+  background: var(--banner-bg); color: var(--banner-text); font-size: 12.5px; margin-bottom: 14px;
 }
+.banner a { color: var(--banner-text); text-decoration: underline; font-weight: 700; }
+
+/* ============ 结果面板 ============ */
+pre.result {
+  margin: 10px 0 0; padding: 12px 14px; border-radius: 14px; background: var(--result-bg);
+  border: 1px solid var(--line-strong); font-family: var(--mono); font-size: 11.5px; max-height: 220px; overflow: auto;
+  white-space: pre-wrap; word-break: break-word; color: var(--text-2);
+}
+
+/* ============ 日志 ============ */
 .logs-card { padding: 0; overflow: hidden; }
-.logs-head { display: flex; align-items: center; gap: 8px; padding: 12px 15px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.logs-head { display: flex; align-items: center; gap: 8px; padding: 13px 16px; border-bottom: 1px solid var(--line); flex-wrap: wrap; background: var(--surface); }
 .logs-head h3 { margin: 0; }
 .logs-head .spacer { flex: 1; }
 .logs-tools { display: flex; gap: 7px; align-items: center; flex-wrap: wrap; }
 .logs-tools select, .logs-tools input {
-  border: 1px solid var(--line); background: rgba(8,12,22,0.78); color: var(--text);
-  border-radius: 7px; padding: 5px 8px; font-size: 11px;
+  border: 1px solid var(--line-strong); background: var(--input-bg); color: var(--text-2);
+  border-radius: 999px; padding: 6px 11px; font-size: 11.5px;
 }
-.logs-tools input { width: 150px; }
-.log-list { height: 500px; overflow: auto; padding: 8px 14px 14px; font-family: var(--mono); font-size: 11px; background: rgba(2, 6, 23, 0.3); }
-.log-line { display: flex; gap: 8px; padding: 1px 0; white-space: pre-wrap; word-break: break-all; }
-.log-time { color: #566079; flex: none; }
-.log-level { flex: none; width: 42px; font-weight: 700; }
-.log-scope { color: #7b86a0; flex: none; }
-.log-msg { color: #cbd5e1; }
-.log-line.warn .log-level { color: var(--warn); }
-.log-line.error .log-level { color: var(--bad); }
-.log-line.debug .log-level, .log-line.trace .log-level { color: #67e8f9; }
+.logs-tools input { width: 160px; }
+.logs-tools input:focus, .logs-tools select:focus { outline: none; border-color: rgba(122, 92, 255, 0.5); box-shadow: 0 0 0 4px rgba(122, 92, 255, 0.1); }
+.log-list {
+  height: 500px; overflow: auto; padding: 12px 16px 16px;
+  font-family: var(--mono); font-size: 11.5px; background: var(--log-bg); color: var(--log-text);
+}
+.log-line { display: flex; gap: 8px; padding: 1.5px 0; white-space: pre-wrap; word-break: break-all; }
+.log-time { color: var(--log-time); flex: none; }
+.log-level { flex: none; width: 44px; font-weight: 700; }
+.log-scope { color: var(--log-scope); flex: none; }
+.log-msg { color: var(--log-msg); }
+.log-line.warn .log-level { color: var(--log-warn); }
+.log-line.error .log-level { color: var(--log-error); }
+.log-line.debug .log-level, .log-line.trace .log-level { color: var(--log-debug); }
+.log-line.info .log-level { color: var(--log-info); }
+
+/* ============ 关于 ============ */
 .about-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; }
-.kv { padding: 8px 0; border-bottom: 1px dashed rgba(148,163,184,0.11); }
-.kv span { display: block; color: var(--muted); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; }
-.kv strong { display: block; font-family: var(--mono); font-size: 12px; font-weight: 500; word-break: break-all; }
+.kv { padding: 8px 0; border-bottom: 1px dashed var(--line-strong); }
+.kv span { display: block; color: var(--muted); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; }
+.kv strong { display: block; font-family: var(--mono); font-size: 12px; font-weight: 500; word-break: break-all; color: var(--text-2); }
+
+/* ============ WebSocket 卡片 ============ */
 .ws-toolbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
 .ws-toolbar h3 { margin: 0; }
 .ws-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
 .ws-card {
-  border: 1px solid var(--line); border-radius: 13px; padding: 14px 15px;
-  background: linear-gradient(180deg, rgba(24,31,50,0.75), rgba(11,16,28,0.7));
+  border: 1px solid var(--line); border-radius: 18px; padding: 15px 16px;
+  background: var(--ws-grad);
+  box-shadow: var(--shadow-xs);
   display: flex; flex-direction: column; gap: 10px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 }
+.ws-card:hover { border-color: rgba(122, 92, 255, 0.34); box-shadow: var(--shadow-sm); transform: translateY(-1px); }
 .ws-card.off { opacity: 0.62; }
 .ws-card-head { display: flex; align-items: center; gap: 10px; }
-.ws-name { font-weight: 650; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ws-name { font-weight: 750; font-size: 14.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ws-card-head .spacer { flex: 1; }
 .ws-meta { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 5px 8px; font-size: 12px; }
 .ws-meta span { color: var(--muted); }
 .ws-meta code { font-family: var(--mono); font-size: 11px; color: var(--accent); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ws-actions { display: flex; gap: 6px; flex-wrap: wrap; }
-.ws-actions .btn { padding: 5px 9px; font-size: 11px; }
-.ws-empty { grid-column: 1 / -1; padding: 28px; text-align: center; border: 1px dashed var(--line); border-radius: 12px; color: var(--muted); }
-.switch { position: relative; width: 38px; height: 22px; flex: none; display: inline-block; }
+.ws-actions .btn { padding: 5px 10px; font-size: 11px; }
+.ws-empty { grid-column: 1 / -1; padding: 30px; text-align: center; border: 1px dashed var(--line-strong); border-radius: 18px; color: var(--muted); background: var(--surface); }
+
+/* ============ 开关 ============ */
+.switch { position: relative; width: 40px; height: 23px; flex: none; display: inline-block; }
 .switch input { opacity: 0; width: 0; height: 0; }
-.switch span { position: absolute; inset: 0; border-radius: 999px; background: #334155; transition: 0.16s; cursor: pointer; }
-.switch span::after { content: ""; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; border-radius: 50%; background: #cbd5e1; transition: 0.16s; }
-.switch input:checked + span { background: rgba(56,189,248,0.8); }
-.switch input:checked + span::after { transform: translateX(16px); background: #04121f; }
+.switch span { position: absolute; inset: 0; border-radius: 999px; background: var(--switch-off); transition: 0.18s; cursor: pointer; }
+.switch span::after {
+  content: ""; position: absolute; width: 17px; height: 17px; left: 3px; top: 3px; border-radius: 50%;
+  background: #fff; box-shadow: 0 2px 6px rgba(33, 26, 51, 0.18); transition: 0.18s;
+}
+.switch input:checked + span { background: var(--gradient); }
+.switch input:checked + span::after { transform: translateX(17px); }
+
+/* ============ 弹窗 ============ */
 .modal-overlay {
   position: fixed; inset: 0; z-index: 55; display: grid; place-items: center; padding: 20px;
-  background: rgba(3, 7, 18, 0.78); backdrop-filter: blur(8px);
+  background: var(--overlay); backdrop-filter: blur(10px);
 }
 .ws-form { width: min(560px, 100%); }
 .ws-form .form-grid { margin: 12px 0; }
 .ws-form .login-actions { margin-top: 6px; }
-.login-box { width: min(380px, 100%); padding: 24px; border-radius: 17px; border: 1px solid var(--line-strong); background: #0d1424; box-shadow: 0 30px 90px rgba(0,0,0,0.55); }
-.login-box h3 { margin: 0 0 4px; font-size: 18px; }
-.login-box p { margin: 0 0 18px; color: var(--muted); font-size: 12px; }
-.login-box input { width: 100%; margin-bottom: 10px; border: 1px solid var(--line); background: rgba(8,12,22,0.9); color: var(--text); border-radius: 9px; padding: 10px 12px; font-family: var(--mono); }
+.login-box {
+  width: min(400px, 100%); padding: 24px; border-radius: 22px; border: 1px solid var(--line-strong);
+  background: var(--surface); box-shadow: var(--shadow-lg);
+}
+.login-box h3 { margin: 0 0 4px; font-size: 19px; font-weight: 800; letter-spacing: -0.02em; }
+.login-box p { margin: 0 0 18px; color: var(--muted); font-size: 12.5px; }
+.login-box input {
+  width: 100%; margin-bottom: 10px; border: 1px solid var(--line-strong); background: var(--input-bg);
+  color: var(--text); border-radius: 11px; padding: 11px 12px; font-family: var(--mono);
+}
+.login-box input:focus { outline: none; border-color: rgba(122, 92, 255, 0.5); box-shadow: 0 0 0 4px rgba(122, 92, 255, 0.1); }
 .login-box .error { color: var(--bad); font-size: 12px; min-height: 18px; }
 .login-actions { display: flex; gap: 8px; }
+
+/* ============ Toast ============ */
 .toast {
-  position: fixed; right: 20px; bottom: 20px; z-index: 60; background: #0f172a; border: 1px solid var(--line);
-  color: var(--text); padding: 10px 14px; border-radius: 10px; box-shadow: 0 12px 40px rgba(0,0,0,0.45);
-  opacity: 0; transform: translateY(8px); transition: all 0.2s ease; pointer-events: none; max-width: 360px; font-size: 12px;
+  position: fixed; right: 20px; bottom: 20px; z-index: 60; background: var(--toast-bg); border: 1px solid var(--line-strong);
+  color: var(--toast-text); padding: 11px 15px; border-radius: 13px; box-shadow: var(--shadow-md);
+  opacity: 0; transform: translateY(8px); transition: all 0.2s ease; pointer-events: none; max-width: 380px; font-size: 12.5px;
 }
 .toast.show { opacity: 1; transform: translateY(0); }
-.footer-note { margin-top: 22px; color: var(--muted); font-size: 11px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.footer-note { margin-top: 22px; color: var(--muted); font-size: 11.5px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+/* ============ 响应式 ============ */
 @media (max-width: 1000px) {
-  .app { grid-template-columns: 1fr; }
-  .ws-grid { grid-template-columns: 1fr; }
-  .sidebar { position: relative; height: auto; flex-direction: row; align-items: center; gap: 14px; padding: 12px 16px; overflow-x: auto; }
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .ws-grid { grid-template-columns: minmax(0, 1fr); }
+  .sidebar {
+    position: relative; height: auto; flex-direction: row; align-items: center; gap: 14px;
+    padding: 12px 16px; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--line);
+    -webkit-mask-image: linear-gradient(90deg, #000 86%, transparent 100%);
+    mask-image: linear-gradient(90deg, #000 86%, transparent 100%);
+  }
   .brand { min-width: 170px; }
   .brand h1 { font-size: 11px; }
   .nav { flex-direction: row; }
-  .nav-item { white-space: nowrap; padding: 7px 10px; }
+  .nav-item { white-space: nowrap; padding: 7px 11px; }
   .side-foot { margin: 0 0 0 auto; border: 0; padding: 0; }
-  .main { padding: 18px 16px 44px; }
+  .main { padding: 20px 16px 44px; }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .grid-two { grid-template-columns: 1fr; }
+  .grid-two { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 620px) {
   .brand p, .brand h1 { display: none; }
   .brand { min-width: 0; }
   .nav-item { font-size: 12px; }
-  .stats { grid-template-columns: 1fr 1fr; }
-  .form-grid { grid-template-columns: 1fr; }
-  .about-grid { grid-template-columns: 1fr; }
-  .editor-row, .editor-row.reverse { grid-template-columns: 1fr 34px; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .form-grid { grid-template-columns: minmax(0, 1fr); }
+  .about-grid { grid-template-columns: minmax(0, 1fr); }
+  .editor-labels { display: none; }
+  .editor-row, .editor-row.reverse { grid-template-columns: minmax(0, 1fr) 34px; }
   .editor-row.reverse input:nth-child(3) { grid-column: 1 / -1; }
-  .topbar h2 { font-size: 17px; }
+  .topbar h2 { font-size: 20px; }
+  .stat-value { font-size: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
 `;
 
@@ -292,6 +504,16 @@ export const WEBUI_HTML = `<!doctype html>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Shadow Dream · OneBot 控制台</title>
+  <script>
+    // 在样式加载前定好主题，避免深色系统下闪一下浅色。
+    (function () {
+      try {
+        var saved = localStorage.getItem('shadowdream.theme');
+        var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (dark) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
   <style>__CSS__</style>
 </head>
 <body>
@@ -306,7 +528,7 @@ export const WEBUI_HTML = `<!doctype html>
       </div>
       <nav class="nav">
         <button class="nav-item active" data-view="overview">概览</button>
-        <button class="nav-item" data-view="network">网络与反代</button>
+        <button class="nav-item" data-view="network">网络与推送</button>
         <button class="nav-item" data-view="ws">WebSocket</button>
         <button class="nav-item" data-view="account">账号</button>
         <button class="nav-item" data-view="debug">调试台</button>
@@ -316,7 +538,7 @@ export const WEBUI_HTML = `<!doctype html>
       </nav>
       <div class="side-foot">
         <span id="side-dot" class="dot"></span>
-        <div><strong id="side-status">连接中</strong><small id="side-version">v0.2.0</small></div>
+        <div><strong id="side-status">连接中</strong><small id="side-version">v0.3.0</small></div>
       </div>
     </aside>
 
@@ -328,6 +550,10 @@ export const WEBUI_HTML = `<!doctype html>
         </div>
         <div class="top-actions">
           <span class="pill"><span id="top-dot" class="dot"></span><span id="top-status">连接中</span></span>
+          <button class="btn ghost sm theme-btn" id="theme-toggle" type="button" title="切换深浅主题" aria-label="切换深浅主题">
+            <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" /></svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" /><path d="M12 2.6v2.2M12 19.2v2.2M4.2 12H2M22 12h-2.2M5.9 5.9 4.3 4.3M19.7 19.7l-1.6-1.6M18.1 5.9l1.6-1.6M4.3 19.7l1.6-1.6" /></svg>
+          </button>
           <button class="btn ghost sm" id="logout-btn">退出</button>
           <button class="btn ghost sm" id="refresh-btn">刷新</button>
         </div>
@@ -356,7 +582,7 @@ export const WEBUI_HTML = `<!doctype html>
         <div class="grid-two">
           <div class="card">
             <h3>连接端点</h3>
-            <p class="hint">供 OneBot SDK 连接；修改请到「网络与反代」。</p>
+            <p class="hint">供 OneBot SDK 连接；修改请到「网络与推送」。</p>
             <div class="endpoint"><span class="name">HTTP API</span><code id="ep-http">-</code><button class="copy" data-copy="ep-http">复制</button></div>
             <div class="endpoint"><span class="name">WebSocket</span><code id="ep-ws">-</code><button class="copy" data-copy="ep-ws">复制</button></div>
             <div class="endpoint"><span class="name">WebUI</span><code id="ep-webui">-</code><button class="copy" data-copy="ep-webui">复制</button></div>
@@ -372,7 +598,7 @@ export const WEBUI_HTML = `<!doctype html>
             <div class="meta-line"><span>配置文件</span><span id="ov-config">-</span></div>
             <div class="meta-line"><span>WebUI 版本</span><span id="ov-version">-</span></div>
             <div class="section-tools">
-              <button class="btn sm" data-goto="network">网络与反代</button>
+              <button class="btn sm" data-goto="network">网络与推送</button>
               <button class="btn ghost sm" data-goto="debug">打开调试台</button>
             </div>
           </div>
@@ -388,7 +614,7 @@ export const WEBUI_HTML = `<!doctype html>
       <section id="view-network" class="view">
         <div class="card">
           <h3>HTTP / WebUI</h3>
-          <p class="hint">WebUI 没有独立监听地址，跟随这里的 host / port。</p>
+          <p class="hint">WebUI 没有独立监听地址，跟随这里的 host / port；改 host / port 会重启传输层。</p>
           <div class="form-grid">
             <label class="field"><span>监听地址</span><input id="net-http-host" type="text" placeholder="127.0.0.1" /></label>
             <label class="field"><span>端口</span><input id="net-http-port" type="number" min="0" max="65535" /></label>
@@ -399,12 +625,6 @@ export const WEBUI_HTML = `<!doctype html>
             <label class="check"><input id="net-http-enabled" type="checkbox" /> 启用 HTTP API</label>
             <label class="check"><input id="net-http-webui" type="checkbox" /> 启用 WebUI</label>
           </div>
-        </div>
-
-        <div class="card">
-          <h3>正向 WebSocket</h3>
-          <p class="hint">已拆到独立板块，每个地址可以单独启用、编辑、删除和测试。</p>
-          <div class="section-tools"><button class="btn sm" data-goto="ws">打开 WebSocket 管理</button></div>
         </div>
 
         <div class="card">
@@ -426,21 +646,17 @@ export const WEBUI_HTML = `<!doctype html>
 
         <div class="card">
           <h3>HTTP POST 事件上报</h3>
-          <p class="hint">每个事件 POST 到这些地址；secret 用于 HMAC-SHA1 签名。</p>
+          <p class="hint">每个事件 POST 到这些地址；secret 用于 HMAC-SHA1 签名。留空的行会被忽略。</p>
+          <div class="editor-labels">
+            <span>上报地址（http/https）</span><span>secret（可选）</span><span></span>
+          </div>
           <div id="net-post-list" class="editor-list"></div>
           <div class="section-tools"><button class="btn ghost sm" id="net-add-post">+ 添加 HTTP POST</button></div>
         </div>
 
-        <div class="card">
-          <h3>反向 WebSocket（自定义反代）</h3>
-          <p class="hint">Shadow Dream 主动连接业务端，推送事件并接收 action。断线会按间隔自动重连。</p>
-          <div id="net-reverse-list" class="editor-list"></div>
-          <div class="section-tools"><button class="btn ghost sm" id="net-add-reverse">+ 添加反向 WS</button></div>
-        </div>
-
         <div class="actions-bar">
-          <button class="btn" id="net-save">保存并应用</button>
-          <button class="btn ghost" id="net-reload">从磁盘重载</button>
+          <button class="btn" id="net-save" disabled>保存并应用</button>
+          <button class="btn ghost" id="net-reload">放弃修改并重载</button>
           <button class="btn ghost" id="net-restart">重启连接</button>
           <span class="status" id="net-status">读取配置中…</span>
         </div>
@@ -450,18 +666,34 @@ export const WEBUI_HTML = `<!doctype html>
         <div class="card">
           <div class="ws-toolbar">
             <div>
-              <h3>正向 WebSocket 服务器</h3>
-              <p class="hint">每个地址独立监听、独立 token、独立启停；保存后自动热重启。</p>
+              <h3>正向 WebSocket</h3>
+              <p class="hint">每个端点独立监听、独立 token。启用开关、编辑、删除都会立即保存并热重启。</p>
             </div>
             <div class="section-tools">
-              <button class="btn" id="ws-new">+ 新建 WebSocket</button>
+              <button class="btn" id="ws-new">+ 新建正向 WS</button>
               <button class="btn ghost" id="ws-refresh">刷新</button>
             </div>
           </div>
           <div id="ws-list" class="ws-grid">
-            <div class="event-empty">还没有 WebSocket 端点</div>
+            <div class="event-empty">还没有正向 WebSocket 端点</div>
           </div>
           <p class="hint" id="ws-status" style="margin:14px 0 0">每个端点对应一个监听地址。</p>
+        </div>
+
+        <div class="card">
+          <div class="ws-toolbar">
+            <div>
+              <h3>反向 WebSocket</h3>
+              <p class="hint">Shadow Dream 主动连接业务端，推送事件并接收 action；断线会按间隔自动重连。</p>
+            </div>
+            <div class="section-tools">
+              <button class="btn" id="reverse-new">+ 新建反向 WS</button>
+            </div>
+          </div>
+          <div id="reverse-list" class="ws-grid">
+            <div class="event-empty">还没有反向 WebSocket 端点</div>
+          </div>
+          <p class="hint" id="reverse-status" style="margin:14px 0 0">每个端点对应一条主动连接。</p>
         </div>
       </section>
 
@@ -603,7 +835,10 @@ export const WEBUI_HTML = `<!doctype html>
               登录后只复用 session；密码不保存。
             </p>
             <p class="hint">
-              插件后端仍是 0.1 实验性，媒体发送需要 highway 上传通道，当前会明确返回 1401。
+              插件后端仍是实验性。文本、表情、@、回复、图片、语音、视频、文件都已可发送：
+              图片支持 PNG / JPEG / GIF / WebP / BMP，语音支持 silk / wav / mp3，
+              视频支持 mp4 / mov，文件不限类型；来源可以是本地路径、
+              <code>file://</code>、<code>http(s)://</code> 或 <code>base64://</code>。
             </p>
           </div>
         </div>
@@ -631,6 +866,22 @@ export const WEBUI_HTML = `<!doctype html>
     </form>
   </div>
 
+  <div class="modal-overlay hidden" id="reverse-modal">
+    <form class="login-box ws-form" id="reverse-form">
+      <h3 id="reverse-modal-title">编辑反向 WebSocket</h3>
+      <p>Shadow Dream 会主动连接这个地址；token 会作为 <code>access_token</code> 放进查询串。</p>
+      <div class="form-grid">
+        <label class="field full"><span>目标地址（ws / wss）</span><input id="reverse-url" type="text" placeholder="ws://127.0.0.1:8080/onebot" /></label>
+        <label class="field"><span>access token（可选）</span><input id="reverse-token" type="text" placeholder="为空表示不鉴权" /></label>
+        <label class="field"><span>重连间隔（ms）</span><input id="reverse-interval" type="number" min="500" max="600000" /></label>
+      </div>
+      <div class="login-actions">
+        <button type="submit" class="btn">保存并应用</button>
+        <button type="button" class="btn ghost" id="reverse-cancel">取消</button>
+      </div>
+    </form>
+  </div>
+
   <div class="toast" id="toast"></div>
   <script>__JS__</script>
 </body>
@@ -651,7 +902,10 @@ export const WEBUI_JS = `
     logLevel: 'all',
     logSearch: '',
     update: null,
-    updateBusy: false
+    updateBusy: false,
+    netDirty: false,
+    wsEditing: null,
+    reverseEditing: null
   };
 
   function $(id) { return document.getElementById(id); }
@@ -806,8 +1060,8 @@ export const WEBUI_JS = `
 
   var viewMeta = {
     overview: ['概览', '运行状态与连接'],
-    network: ['网络与反代', 'HTTP / 反向 WS / 自动重载'],
-    ws: ['WebSocket', '正向 WebSocket 服务器（每个地址独立管理）'],
+    network: ['网络与推送', 'HTTP / WebUI、心跳与 HTTP POST'],
+    ws: ['WebSocket', '正向 / 反向端点，改动立即保存并热重启'],
     account: ['账号', '当前登录账号与后端登录方式'],
     debug: ['调试台', '动作调用与模拟消息'],
     logs: ['日志', '实时日志与过滤器'],
@@ -815,6 +1069,10 @@ export const WEBUI_JS = `
     about: ['关于', '版本、配置与安全提示']
   };
   function switchView(view) {
+    if (state.netDirty && state.view === 'network' && view !== 'network') {
+      if (!confirm('「网络与推送」有未保存的修改，离开会丢失。确定离开吗？')) return;
+      setNetDirty(false);
+    }
     state.view = view;
     document.querySelectorAll('.nav-item').forEach(function (item) {
       item.classList.toggle('active', item.dataset.view === view);
@@ -827,10 +1085,27 @@ export const WEBUI_JS = `
     if (location.hash !== '#' + view) {
       try { history.replaceState(null, '', '#' + view); } catch (e) {}
     }
-    if (view === 'network' || view === 'ws') loadConfig();
+    // 有未保存修改时重新拉配置会覆盖表单，所以只在干净状态下刷新。
+    if (view === 'network' && !state.netDirty) loadConfig();
+    if (view === 'ws') loadConfig();
     if (view === 'logs') refreshLogs();
     if (view === 'update') loadUpdateInfo();
     if (view === 'about' && state.overview) renderAbout(state.overview);
+  }
+
+  /** 网络与推送是整页表单：记录脏状态，保存前不静默丢失修改。 */
+  function setNetDirty(dirty) {
+    state.netDirty = Boolean(dirty);
+    var save = $('net-save');
+    if (save) save.disabled = !state.netDirty;
+    var status = $('net-status');
+    if (!status) return;
+    status.classList.toggle('dirty', state.netDirty);
+    if (state.netDirty) {
+      setText('net-status', '有未保存的修改');
+    } else if (state.configPath || (state.overview && state.overview.config.path)) {
+      setText('net-status', '配置文件：' + (state.configPath || state.overview.config.path));
+    }
   }
 
   function renderStatus(overview) {
@@ -902,7 +1177,7 @@ export const WEBUI_JS = `
     $('sim-run').disabled = !data.simulator;
     renderAccount(data);
     if (state.view === 'about') renderAbout(data);
-    if (state.view === 'ws') renderWs();
+    if (state.view === 'ws') { renderWs(); renderReverseWs(); }
   }
 
   function renderAccount(data) {
@@ -951,7 +1226,7 @@ export const WEBUI_JS = `
       state.config = data.config;
       state.configPath = data.path;
       if (state.view === 'network') renderNetwork();
-      if (state.view === 'ws') renderWs();
+      if (state.view === 'ws') { renderWs(); renderReverseWs(); }
     }).catch(function (error) {
       setText('net-status', '读取失败：' + (error.message || error));
     });
@@ -973,9 +1248,8 @@ export const WEBUI_JS = `
     setFormValue('net-log-level', cfg.logLevel);
     $('net-post-list').innerHTML = '';
     (cfg.httpPost || []).forEach(function (item) { addPostRow(item); });
-    $('net-reverse-list').innerHTML = '';
-    (cfg.reverseWs || []).forEach(function (item) { addReverseRow(item); });
-    setText('net-status', '配置文件：' + (state.configPath || (state.overview ? state.overview.config.path : '未知')));
+    state.configPath = state.configPath || (state.overview ? state.overview.config.path : '');
+    setNetDirty(false);
   }
 
   function addPostRow(item) {
@@ -986,22 +1260,11 @@ export const WEBUI_JS = `
       + '<button class="del" type="button" title="删除">×</button>';
     row.querySelector('.post-url').value = item && item.url ? item.url : '';
     row.querySelector('.post-secret').value = item && item.secret ? item.secret : '';
-    row.querySelector('.del').addEventListener('click', function () { row.remove(); });
+    row.querySelector('.del').addEventListener('click', function () {
+      row.remove();
+      setNetDirty(true);
+    });
     $('net-post-list').appendChild(row);
-  }
-
-  function addReverseRow(item) {
-    var row = document.createElement('div');
-    row.className = 'editor-row reverse';
-    row.innerHTML = '<input type="text" class="rev-url" placeholder="ws://127.0.0.1:8080/onebot" />'
-      + '<input type="text" class="rev-token" placeholder="token（可选）" />'
-      + '<input type="number" class="rev-interval" placeholder="重连 ms" min="500" />'
-      + '<button class="del" type="button" title="删除">×</button>';
-    row.querySelector('.rev-url').value = item && item.url ? item.url : '';
-    row.querySelector('.rev-token').value = item && item.accessToken ? item.accessToken : '';
-    row.querySelector('.rev-interval').value = item && item.reconnectIntervalMs ? item.reconnectIntervalMs : 3000;
-    row.querySelector('.del').addEventListener('click', function () { row.remove(); });
-    $('net-reverse-list').appendChild(row);
   }
 
   function collectConfig() {
@@ -1023,15 +1286,6 @@ export const WEBUI_JS = `
       if (!url) return null;
       var secret = row.querySelector('.post-secret').value.trim();
       return secret ? { url: url, secret: secret } : { url: url };
-    }).filter(Boolean);
-    cfg.reverseWs = Array.prototype.map.call(document.querySelectorAll('#net-reverse-list .reverse-row, #net-reverse-list .editor-row'), function (row) {
-      var url = row.querySelector('.rev-url').value.trim();
-      if (!url) return null;
-      var item = { url: url };
-      var token = row.querySelector('.rev-token').value.trim();
-      if (token) item.accessToken = token;
-      item.reconnectIntervalMs = Number(row.querySelector('.rev-interval').value) || 3000;
-      return item;
     }).filter(Boolean);
     return cfg;
   }
@@ -1066,7 +1320,7 @@ export const WEBUI_JS = `
     var list = $('ws-list');
     if (!list) return;
     if (servers.length === 0) {
-      list.innerHTML = '<div class="ws-empty">还没有 WebSocket 端点，点右上角「新建 WebSocket」。</div>';
+      list.innerHTML = '<div class="ws-empty">还没有正向端点，点右上角「新建正向 WS」。</div>';
       setText('ws-status', '0 个端点');
       return;
     }
@@ -1114,6 +1368,44 @@ export const WEBUI_JS = `
     });
   }
 
+  /** 反向 WebSocket：主动连出去，与正向端点同一页、同样的卡片交互。 */
+  function renderReverseWs() {
+    var list = $('reverse-list');
+    if (!list || !state.config) return;
+    var targets = Array.isArray(state.config.reverseWs) ? state.config.reverseWs : [];
+    if (targets.length === 0) {
+      list.innerHTML = '<div class="ws-empty">还没有反向端点，点右上角「新建反向 WS」。</div>';
+      setText('reverse-status', '0 个端点');
+      return;
+    }
+    list.innerHTML = targets.map(function (item, index) {
+      var interval = item.reconnectIntervalMs || 3000;
+      return '<div class="ws-card" data-index="' + index + '">'
+        + '<div class="ws-card-head">'
+        + '<div class="ws-name">反向 WebSocket ' + (index + 1) + '</div>'
+        + '<div class="spacer"></div>'
+        + '<span class="chip badge-ok">已配置</span>'
+        + '</div>'
+        + '<div class="ws-meta">'
+        + '<span>目标</span><code>' + esc(item.url || '') + '</code>'
+        + '<span>重连</span><span>' + interval + ' ms</span>'
+        + '<span>token</span><span>' + (item.accessToken ? '已设置' : '未设置') + '</span>'
+        + '</div>'
+        + '<div class="ws-actions">'
+        + '<button class="btn ghost reverse-edit" data-index="' + index + '">编辑</button>'
+        + '<button class="btn danger reverse-del" data-index="' + index + '">删除</button>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+    setText('reverse-status', targets.length + ' 个端点');
+    list.querySelectorAll('.reverse-edit').forEach(function (button) {
+      button.addEventListener('click', function () { openReverseModal(Number(button.dataset.index)); });
+    });
+    list.querySelectorAll('.reverse-del').forEach(function (button) {
+      button.addEventListener('click', function () { deleteReverse(Number(button.dataset.index)); });
+    });
+  }
+
   function persistWs(cfg, message) {
     request('/webui/api/config', {
       method: 'POST',
@@ -1122,9 +1414,10 @@ export const WEBUI_JS = `
       state.config = cfg;
       mirrorWs(state.config);
       renderWs();
+      renderReverseWs();
       showToast(message || 'WebSocket 配置已保存');
       if (data.data && data.data.restartScheduled) {
-        showBanner('WebSocket 监听配置已改变，传输层正在重启；如果 WebUI 断开，请稍后刷新。');
+        showBanner('WebSocket 配置已改变，传输层正在重启；如果 WebUI 断开，请稍后刷新。');
       }
       setTimeout(loadOverview, 800);
     }).catch(function (error) {
@@ -1194,6 +1487,55 @@ export const WEBUI_JS = `
     persistWs(cfg, '端点已删除');
   }
 
+  function openReverseModal(index) {
+    var targets = Array.isArray(state.config && state.config.reverseWs) ? state.config.reverseWs : [];
+    state.reverseEditing = typeof index === 'number' ? index : null;
+    var item = state.reverseEditing !== null ? targets[state.reverseEditing] : null;
+    setText('reverse-modal-title', item ? '编辑反向 WebSocket' : '新建反向 WebSocket');
+    setValue('reverse-url', item ? item.url : '');
+    setValue('reverse-token', item && item.accessToken ? item.accessToken : '');
+    setValue('reverse-interval', item && item.reconnectIntervalMs ? item.reconnectIntervalMs : 3000);
+    $('reverse-modal').classList.remove('hidden');
+  }
+
+  function closeReverseModal() {
+    $('reverse-modal').classList.add('hidden');
+    state.reverseEditing = null;
+  }
+
+  function saveReverseForm(event) {
+    event.preventDefault();
+    var url = $('reverse-url').value.trim();
+    var interval = Number($('reverse-interval').value) || 3000;
+    if (!/^wss?:\\/\\/[^\\s]+$/i.test(url)) {
+      showToast('目标地址必须是 ws:// 或 wss://');
+      return;
+    }
+    if (interval < 500 || interval > 600000) {
+      showToast('重连间隔需要在 500 - 600000 ms 之间');
+      return;
+    }
+    var cfg = JSON.parse(JSON.stringify(state.config || {}));
+    if (!Array.isArray(cfg.reverseWs)) cfg.reverseWs = [];
+    var item = { url: url };
+    var token = $('reverse-token').value.trim();
+    if (token) item.accessToken = token;
+    item.reconnectIntervalMs = interval;
+    if (state.reverseEditing !== null) cfg.reverseWs[state.reverseEditing] = item;
+    else cfg.reverseWs.push(item);
+    persistWs(cfg, state.reverseEditing !== null ? '反向端点已保存' : '反向端点已添加');
+    closeReverseModal();
+  }
+
+  function deleteReverse(index) {
+    var cfg = JSON.parse(JSON.stringify(state.config || {}));
+    if (!Array.isArray(cfg.reverseWs) || !cfg.reverseWs[index]) return;
+    var url = cfg.reverseWs[index].url || '';
+    if (!confirm('删除反向端点「' + url + '」？')) return;
+    cfg.reverseWs.splice(index, 1);
+    persistWs(cfg, '反向端点已删除');
+  }
+
   function testWs(index) {
     var servers = wsServersConfig();
     var server = servers[index];
@@ -1246,6 +1588,7 @@ export const WEBUI_JS = `
   function saveNetwork() {
     if (!state.config) return;
     var cfg = collectConfig();
+    if (!validateNetwork(cfg)) return;
     $('net-save').disabled = true;
     setText('net-status', '保存中…');
     request('/webui/api/config', {
@@ -1253,7 +1596,9 @@ export const WEBUI_JS = `
       body: JSON.stringify({ config: cfg, persist: true })
     }).then(function (data) {
       state.config = cfg;
+      state.configPath = data.data && data.data.configPath ? data.data.configPath : state.configPath;
       var result = data.data || {};
+      setNetDirty(false);
       if (result.restartScheduled) {
         var host = (cfg.http.host === '0.0.0.0' || cfg.http.host === '::')
           ? (window.location.hostname || '127.0.0.1')
@@ -1264,13 +1609,36 @@ export const WEBUI_JS = `
       } else {
         hideBanner();
         showToast('配置已保存并应用');
-        setText('net-status', '已应用');
       }
       setTimeout(loadOverview, 700);
     }).catch(function (error) {
+      setNetDirty(true);
       setText('net-status', '保存失败：' + (error.message || error));
       showToast('保存失败：' + (error.message || error));
-    }).finally(function () { $('net-save').disabled = false; });
+    });
+  }
+
+  /** 保存前把明显的 URL 错误挑出来，避免“保存成功但连接一直失败”。 */
+  function validateNetwork(cfg) {
+    var invalid = 0;
+    Array.prototype.forEach.call(document.querySelectorAll('#net-post-list .post-row'), function (row) {
+      var input = row.querySelector('.post-url');
+      var url = input.value.trim();
+      var secret = row.querySelector('.post-secret').value.trim();
+      var ok = url ? /^https?:\\/\\/[^\\s]+$/i.test(url) : !secret;
+      input.classList.toggle('invalid', !ok);
+      if (!ok) invalid++;
+    });
+    if (invalid > 0) {
+      showToast('有 ' + invalid + ' 个地址格式不对，已标红');
+      setText('net-status', '请先修正标红的地址');
+      return false;
+    }
+    if (cfg.httpPost.length > 40 || cfg.reverseWs.length > 40) {
+      showToast('HTTP POST / 反向 WS 各最多 40 个');
+      return false;
+    }
+    return true;
   }
 
   function reloadConfig() {
@@ -1384,7 +1752,12 @@ export const WEBUI_JS = `
 
   function loadAll() {
     loadOverview();
-    if (state.view === 'network' || state.view === 'ws') loadConfig();
+    // 有未保存的表单修改时不重新拉配置，避免刷新按钮把编辑内容冲掉。
+    if (state.view === 'network' && state.netDirty) {
+      showToast('已保留未保存的修改');
+    } else if (state.view === 'network' || state.view === 'ws') {
+      loadConfig();
+    }
     if (state.view === 'logs') refreshLogs();
     if (state.view === 'update') loadUpdateInfo();
   }
@@ -1409,6 +1782,7 @@ export const WEBUI_JS = `
     var token = btoa(String.fromCharCode.apply(null, bytes))
       .split('+').join('-').split('/').join('_').replace(/=+$/, '');
     $('net-webui-token').value = token;
+    setNetDirty(true);
     showToast('已生成 20 位 token，保存后生效');
   });
   $('logout-btn').addEventListener('click', async function () {
@@ -1420,12 +1794,20 @@ export const WEBUI_JS = `
   $('net-save').addEventListener('click', saveNetwork);
   $('net-reload').addEventListener('click', reloadConfig);
   $('net-restart').addEventListener('click', restartConnections);
-  $('net-add-post').addEventListener('click', function () { addPostRow({}); });
-  $('net-add-reverse').addEventListener('click', function () { addReverseRow({}); });
+  // 网络与推送是一张整页表单：任何输入都标记为“未保存”。
+  $('view-network').addEventListener('input', function () { setNetDirty(true); });
+  $('view-network').addEventListener('change', function () { setNetDirty(true); });
+  $('net-add-post').addEventListener('click', function () {
+    addPostRow({});
+    setNetDirty(true);
+  });
   $('ws-new').addEventListener('click', function () { openWsModal(); });
   $('ws-refresh').addEventListener('click', function () { loadConfig(); });
   $('ws-form').addEventListener('submit', saveWsForm);
   $('ws-cancel').addEventListener('click', closeWsModal);
+  $('reverse-new').addEventListener('click', function () { openReverseModal(); });
+  $('reverse-form').addEventListener('submit', saveReverseForm);
+  $('reverse-cancel').addEventListener('click', closeReverseModal);
   $('action-run').addEventListener('click', runAction);
   $('action-fill').addEventListener('click', function () {
     $('action-name').value = 'send_group_msg';
@@ -1457,6 +1839,22 @@ export const WEBUI_JS = `
   var initialView = location.hash.replace(/^#/, '');
   switchView(viewMeta[initialView] ? initialView : 'overview');
   loadOverview();
+
+  // 深浅主题：首次跟随系统，手动切换后记住选择。
+  $('theme-toggle').addEventListener('click', function () {
+    var dark = document.documentElement.classList.toggle('dark');
+    try { localStorage.setItem('shadowdream.theme', dark ? 'dark' : 'light'); } catch (e) {}
+    showToast(dark ? '已切换到深色模式' : '已切换到浅色模式');
+  });
+  try {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (event) {
+      var saved = null;
+      try { saved = localStorage.getItem('shadowdream.theme'); } catch (e) {}
+      if (saved) return;
+      document.documentElement.classList.toggle('dark', event.matches);
+    });
+  } catch (e) {}
+
   setInterval(function () { if (state.view !== 'logs') loadOverview(); }, 3000);
   setInterval(function () {
     if (state.view === 'logs') refreshLogs();

@@ -8,16 +8,29 @@ export default defineConfig({
   description: '影梦 · 把 QQ 接入 OneBot 11 的轻量运行时',
   base,
   cleanUrls: true,
+  // 代码块统一用深色底 + 浅色语法，和首页终端卡片保持一致。
+  markdown: {
+    theme: { light: 'vitesse-dark', dark: 'vitesse-dark' },
+  },
   head: [
-    ['meta', { name: 'theme-color', content: '#0b1220' }],
+    ['meta', { name: 'theme-color', content: '#fdfbff' }],
     ['meta', { name: 'og:type', content: 'website' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: `${base}logo.svg` }],
+    ['link', { rel: 'apple-touch-icon', href: `${base}logo.svg` }],
   ],
+  vite: {
+    server: {
+      // 编辑器 / 工具在写文件时会留下临时目录，Windows 下监听它们会抛 EBUSY。
+      watch: {
+        ignored: ['**/*.tmpdir/**', '**/*.tmp', '**/.vitepress/cache/**', '**/.vitepress/dist/**'],
+      },
+    },
+  },
   themeConfig: {
+    logo: { src: '/logo.svg', width: 30, height: 30 },
     nav: [
-      { text: '开始', link: '/guide/introduction' },
-      { text: '部署', link: '/guide/install' },
-      { text: '排故', link: '/guide/troubleshooting' },
-      { text: 'API', link: '/api/onebot' },
+      { text: '指南', link: '/guide/introduction', activeMatch: '/guide/' },
+      { text: 'API', link: '/api/onebot', activeMatch: '/api/' },
       { text: '更新日志', link: 'https://github.com/derammeng/Shadow-Dream/blob/main/CHANGELOG.md' },
     ],
     sidebar: {
@@ -57,7 +70,29 @@ export default defineConfig({
         },
       ],
     },
-    search: { provider: 'local' },
+    search: {
+      provider: 'local',
+      options: {
+        translations: {
+          button: { buttonText: '搜索文档', buttonAriaLabel: '搜索文档' },
+          modal: {
+            displayDetails: '显示详情',
+            resetButtonTitle: '清除查询',
+            backButtonTitle: '返回',
+            noResultsText: '没有找到结果',
+            footer: {
+              selectText: '选择',
+              selectKeyAriaLabel: '回车',
+              navigateText: '切换',
+              navigateUpKeyAriaLabel: '上箭头',
+              navigateDownKeyAriaLabel: '下箭头',
+              closeText: '关闭',
+              closeKeyAriaLabel: 'Esc',
+            },
+          },
+        },
+      },
+    },
     socialLinks: [
       { icon: 'github', link: 'https://github.com/derammeng/Shadow-Dream' },
     ],
@@ -71,9 +106,14 @@ export default defineConfig({
       text: '最后更新',
       formatOptions: { dateStyle: 'short', timeStyle: 'short' },
     },
+    returnToTopLabel: '回到顶部',
+    sidebarMenuLabel: '菜单',
+    darkModeSwitchLabel: '主题',
+    lightModeSwitchTitle: '切换到浅色模式',
+    darkModeSwitchTitle: '切换到深色模式',
     footer: {
-      message: 'Shadow Dream · 影梦',
-      copyright: 'MIT License',
+      message: 'Shadow Dream · 影梦 · 把 QQ 接进 OneBot 11',
+      copyright: 'MIT License · 与腾讯无关',
     },
   },
 });

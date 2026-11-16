@@ -141,6 +141,19 @@ export interface ConvertContext {
   /** 发送时所在群；私聊为 undefined。 */
   groupId?: number;
   memberByUin?(groupId: number, uin: number): MemberLike | undefined;
+  /**
+   * 媒体段（图片 / 语音）的上传钩子。由后端在发送时注入：它负责把本地文件
+   * 放进 QQ 的富媒体缓存目录并构造 picElement / pttElement。
+   * 不注入时媒体段仍然明确报 1401。
+   */
+  media?: MediaHooks;
+}
+
+export interface MediaHooks {
+  image(data: Record<string, unknown>): Promise<Record<string, unknown>>;
+  record(data: Record<string, unknown>): Promise<Record<string, unknown>>;
+  video(data: Record<string, unknown>): Promise<Record<string, unknown>>;
+  file(data: Record<string, unknown>): Promise<Record<string, unknown>>;
 }
 
 const ROLE: Record<number, 'owner' | 'admin' | 'member'> = {
@@ -359,8 +372,9 @@ function elementId(): string {
 /**
  * OneBot 消息段 → NTQQ sendMsg 元素。
  *
- * 0.2 支持 text / at / face / reply / json / mface。媒体类需要 highway
- * 上传，直接塞本地路径不会成功，因此明确返回 1401，而不是发出一条坏消息。
+ * 支持 text / at / face / reply / json / mface / image / record / video / file。
+ * 媒体类交给 `ctx.media` 钩子（后端负责落盘、转码与缩略图），没有钩子时明确
+ * 返回 1401，而不是发出一条坏消息。
  */
 export async function messageToElements(
   message: MessageSegment[],
@@ -477,11 +491,20 @@ export async function messageToElements(
       case 'image':
       case 'record':
       case 'video':
-      case 'file':
-        throw ActionError.unsupported(
-          `QQNT 插件暂不支持发送 ${segment.type}：需要 highway 上传通道。`
-          + ' text / at / face / reply / json / mface 已可用。',
-        );
+      case 'file': {
+        const hook = segment.type === 'image' ? ctx.media?.image
+          : segment.type === 'record' ? ctx.media?.record
+            : segment.type === 'video' ? ctx.media?.video
+              : ctx.media?.file;
+        if (!hook) {
+          throw ActionError.unsupported(
+            `QQNT 插件暂不支持发送 ${segment.type}：媒体上传通道不可用。`
+            + ' text / at / face / reply / json / mface 已可用。',
+          );
+        }
+        out.push(await hook(data));
+        break;
+      }
       default:
         throw ActionError.unsupported(`QQNT 插件暂不支持的消息段：${segment.type}`);
     }

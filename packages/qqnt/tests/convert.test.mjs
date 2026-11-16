@@ -173,10 +173,50 @@ test('发送文本 / at / face / reply 能构造 NTQQ elements', async () => {
   assert.equal(elements[3].replyElement.replayMsgId, target.msgId);
 });
 
-test('发送媒体明确抛 1401，而不是生成坏 element', async () => {
+test('发送媒体：没有上传钩子时明确抛 1401', async () => {
   const ctx = makeContext();
   await assert.rejects(
     () => convert.messageToElements([{ type: 'image', data: { file: 'a.png' } }], ctx),
+    error => error && error.retcode === 1401,
+  );
+});
+
+test('发送媒体：有上传钩子时交给钩子构造 element', async () => {
+  const ctx = makeContext({
+    media: {
+      image: async data => ({ elementType: 2, elementId: '', picElement: { summary: String(data.summary ?? '') } }),
+      record: async data => ({ elementType: 4, elementId: '', pttElement: { duration: Number(data.duration ?? 0) } }),
+      video: async data => ({ elementType: 5, elementId: '', videoElement: { fileName: String(data.file ?? '') } }),
+      file: async data => ({ elementType: 3, elementId: '', fileElement: { fileName: String(data.name ?? data.file ?? '') } }),
+    },
+  });
+
+  const elements = await convert.messageToElements([
+    { type: 'image', data: { file: '/tmp/a.png', summary: '图' } },
+    { type: 'record', data: { file: '/tmp/a.mp3', duration: 3 } },
+    { type: 'video', data: { file: '/tmp/a.mp4' } },
+    { type: 'file', data: { file: '/tmp/a.zip', name: 'a.zip' } },
+  ], ctx);
+
+  assert.equal(elements.length, 4);
+  assert.equal(elements[0].elementType, 2);
+  assert.equal(elements[0].picElement.summary, '图');
+  assert.equal(elements[1].elementType, 4);
+  assert.equal(elements[1].pttElement.duration, 3);
+  assert.equal(elements[2].elementType, 5);
+  assert.equal(elements[2].videoElement.fileName, '/tmp/a.mp4');
+  assert.equal(elements[3].elementType, 3);
+  assert.equal(elements[3].fileElement.fileName, 'a.zip');
+});
+
+test('没有上传钩子时 video / file 也明确抛 1401', async () => {
+  const ctx = makeContext();
+  await assert.rejects(
+    () => convert.messageToElements([{ type: 'video', data: { file: 'a.mp4' } }], ctx),
+    error => error && error.retcode === 1401,
+  );
+  await assert.rejects(
+    () => convert.messageToElements([{ type: 'file', data: { file: 'a.zip' } }], ctx),
     error => error && error.retcode === 1401,
   );
 });

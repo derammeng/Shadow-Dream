@@ -22,7 +22,7 @@ Shadow Dream 不复用它们的 native hook，也不修改 `wrapper.node`：
 
 ## 现在能做什么
 
-- 文本、表情、@、回复、群管理；
+- 文本、表情、@、回复、图片、语音、视频、文件、群管理；
 - 私聊 / 群聊消息收发；
 - HTTP API、正向 WS、反向 WS、HTTP POST；
 - 生命周期、心跳、CQ 码；
@@ -33,7 +33,7 @@ Shadow Dream 不复用它们的 native hook，也不修改 `wrapper.node`：
 - WebUI / CLI 检查更新、下载安装并自动重启；
 - 安装时可选择自动安装 QQ、LiteLoaderQQNT、Xvfb。
 
-媒体（图片、语音、视频、文件）在 0.2 中尚未实现，会明确返回 `1401`，不会静默发坏消息。
+图片支持 PNG / JPEG / GIF / WebP / BMP，语音支持 SILK / WAV / MP3（自动转 SILK），视频支持 MP4 / MOV，文件不限类型；来源可以是本地路径、`file://`、`http(s)://` 或 `base64://`。
 
 ## 下一步
 

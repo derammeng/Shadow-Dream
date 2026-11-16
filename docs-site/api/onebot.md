@@ -65,7 +65,7 @@ set_group_card
 set_group_kick
 ```
 
-媒体发送尚未实现，会返回 `1401`。
+图片 / 语音 / 视频 / 文件都已支持发送：`image` / `record` / `video` / `file` 的 `file` 可以是本地路径、`file://`、`http(s)://` 或 `base64://`；图片格式 PNG / JPEG / GIF / WebP / BMP，语音 SILK / WAV / MP3（自动转 SILK），视频 MP4 / MOV，文件不限类型。
 
 ## 消息格式
 
@@ -73,6 +73,6 @@ set_group_kick
 - 消息段数组；
 - `auto_escape`；
 - 私聊 / 群聊；
-- 回复、@、表情。
+- 回复、@、表情、图片、语音、视频、文件。
 
 完整 action 列表和参数见 WebUI「调试台」，或源码 `packages/core/src/types/onebot.ts`。
